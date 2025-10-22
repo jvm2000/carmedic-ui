@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import Layout from './layouts/DefaultLayout.vue'
 import { onMounted } from 'vue'
 
 function setTitle(titleChunk: string | null) {
   document.title = titleChunk
-    ? `${titleChunk} · Abled Online`
-    : 'Abled Online'
+    ? `${titleChunk} · CarMedic`
+    : 'CarMedic'
 }
 
 function setFavicon(href: string) {
@@ -26,8 +25,6 @@ onMounted(() => {
 
 <template>
   <div id="app">
-    <Layout>
-      <router-view />
-    </Layout>
+    <router-view />
   </div>
 </template>
