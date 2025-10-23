@@ -28,7 +28,7 @@ const props = withDefaults(
 <template>
   <button 
     v-bind="$attrs"
-    class="flex items-center px-4 py-2.5 text-sm rounded-md ring-1 ring-red-600 font-medium hover:scale-105 transition-transform duration-300 ease-in-out"
+    class="flex items-center px-4 py-2.5 text-base rounded-md ring-1 ring-red-600 font-medium hover:opacity-90 justify-center w-full"
     :class="[
       props.type === 'primary'
         ? 'bg-red-600 text-white'
