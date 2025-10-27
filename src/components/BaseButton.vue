@@ -35,6 +35,7 @@ const props = withDefaults(
 <template>
   <button 
     v-bind="$attrs"
+    type="submit"
     class="flex items-center px-4 py-2.5 text-base rounded-md ring-1 ring-red-600 font-medium hover:opacity-90 justify-center w-full disabled:opacity-75"
     :class="[
       props.type === 'primary'

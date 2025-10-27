@@ -38,8 +38,13 @@ export const dbHelper = {
       const response = await fetch(`${API_BASE_URL}${endpoint}`, fetchOptions);
       const result = await response.json();
 
-      if (!result.ok) {
+      if (!response.ok) {
         throw { response: result }; // ✅ allows `error.response.errors` in catch
+      }
+
+      // ✅ If login succeeded, store the token
+      if (endpoint === '/login' && result.token) {
+        localStorage.setItem('auth_token', result.token);
       }
 
       return result as T;
@@ -64,4 +69,8 @@ export const dbHelper = {
   delete<T = any>(endpoint: string, token?: string) {
     return this.request<T>(endpoint, { method: 'DELETE', token });
   },
+
+  getAuthToken() {
+    return localStorage.getItem('auth_token');
+  }
 };

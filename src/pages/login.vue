@@ -5,8 +5,9 @@ import BaseInput from '../components/BaseInput.vue';
 import BaseCombobox from '../components/BaseCombobox.vue';
 import { dbHelper } from '../helpers/dbHelper';
 import { getError } from '../helpers/errorHelper';
+import { useAuth } from '../composables/useAuth';
 
-type LoginForm = {
+type SignUpForm = {
   email: string,
   full_name: string,
   phone_number: string,
@@ -14,6 +15,11 @@ type LoginForm = {
   address: string | undefined,
   password: string,
   password_confirmation: string
+}
+
+type LoginForm = {
+  email: string,
+  password: string,
 }
 
 type AddressForm = {
@@ -24,7 +30,7 @@ type AddressForm = {
 }
 
 const type = ref('login')
-const form = ref<LoginForm>({
+const form = ref<SignUpForm>({
   email: '',
   full_name: '',
   phone_number: '',
@@ -39,8 +45,13 @@ const addressForm = ref<AddressForm>({
   postal_code: '',
   street_adress: ''
 })
+const loginForm = ref<LoginForm>({
+  email: '',
+  password: '',
+})
 const errors = ref<any>(null)
 const loading = ref(false)
+const { token } = useAuth()
 
 async function register() {
   loading.value = true
@@ -50,6 +61,21 @@ async function register() {
 
   try {
     await dbHelper.post('/register', form.value);
+  } catch (error: any) {
+    errors.value = error.response.errors
+  } finally {
+    loading.value = false
+  }
+}
+
+async function login() {
+  loading.value = true
+  errors.value = null
+
+  try {
+    const response = await dbHelper.post('/login', loginForm.value);
+
+    token.value = response.data.token
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -67,7 +93,7 @@ const fullAddress = computed(() => {
     <div class="flex flex-col items-center space-y-8 w-full">
       <img src="/images/logo.png" alt="" class="h-16">
 
-      <div class="max-w-lg w-full rounded-lg shadow-sm p-6 flex flex-col items-start space-y-6 border border-red-200 bg-white">
+      <form class="max-w-lg w-full rounded-lg shadow-sm p-6 flex flex-col items-start space-y-6 border border-red-200 bg-white">
         <div>
           <h2 class="text-lg font-bold">Welcome</h2>
 
@@ -89,6 +115,7 @@ const fullAddress = computed(() => {
 
         <div v-if="type === 'login'" class="space-y-6 w-full">
           <BaseInput 
+            v-model="loginForm.email"
             type="Email"
             label="Email"
             placeholder="your@email.com"
@@ -96,6 +123,7 @@ const fullAddress = computed(() => {
           />
 
           <BaseInput 
+            v-model="loginForm.password"
             type="password"
             label="Password"
             placeholder="**********"
@@ -179,11 +207,11 @@ const fullAddress = computed(() => {
           />
         </div>
 
-        <BaseButton 
+        <BaseButton
           :loading
-          @click="register">
+          @click="type === 'login' ? login() : register()">
         {{ type === 'login' ? 'Login' : 'Signup' }}</BaseButton>
-      </div>
+      </form>
     </div>
   </div>
 </template>
