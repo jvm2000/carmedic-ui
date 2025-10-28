@@ -1,7 +1,8 @@
-import { computed, ref } from "vue";
+import { computed } from "vue"
+import { useCookie } from "./useCookie";
 
 export function useAuth() {
-  const tokenRef = ref<string | null>(null);
+  const tokenRef = useCookie('auth_token')
 
   const isLoggedIn = computed(() => !!tokenRef.value);
 

@@ -6,16 +6,7 @@ import BaseCombobox from '../components/BaseCombobox.vue';
 import { dbHelper } from '../helpers/dbHelper';
 import { getError } from '../helpers/errorHelper';
 import { useAuth } from '../composables/useAuth';
-
-type SignUpForm = {
-  email: string,
-  full_name: string,
-  phone_number: string,
-  whatsapp_number: string,
-  address: string | undefined,
-  password: string,
-  password_confirmation: string
-}
+import type { SignUpForm } from '../types';
 
 type LoginForm = {
   email: string,
@@ -75,7 +66,7 @@ async function login() {
   try {
     const response = await dbHelper.post('/login', loginForm.value);
 
-    token.value = response.data.token
+    token.value = response.access_token
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -93,7 +84,7 @@ const fullAddress = computed(() => {
     <div class="flex flex-col items-center space-y-8 w-full">
       <img src="/images/logo.png" alt="" class="h-16">
 
-      <form class="max-w-lg w-full rounded-lg shadow-sm p-6 flex flex-col items-start space-y-6 border border-red-200 bg-white">
+      <div class="max-w-lg w-full rounded-lg shadow-sm p-6 flex flex-col items-start space-y-6 border border-red-200 bg-white">
         <div>
           <h2 class="text-lg font-bold">Welcome</h2>
 
@@ -150,18 +141,14 @@ const fullAddress = computed(() => {
           <BaseInput 
             v-model="form.phone_number"
             label="Phone Number"
-            placeholder="00000000"
-            min="12"
-            max="12"
+            placeholder="+60 000 000 000"
             :error="getError(errors, 'phone_number')"
           />
 
           <BaseInput 
             v-model="form.whatsapp_number"
             label="Whatsapp Number"
-            placeholder="00000000"
-            min="12"
-            max="12"
+            placeholder="+60 000 000 000"
             :error="getError(errors, 'whatsapp_number')"
           />
 
@@ -187,7 +174,7 @@ const fullAddress = computed(() => {
           <BaseInput
             v-model="addressForm.street_adress"
             label="Address"
-            placeholder="Street Address"
+            placeholder="123, Jalan Example"
           />
 
           <BaseInput 
@@ -211,7 +198,7 @@ const fullAddress = computed(() => {
           :loading
           @click="type === 'login' ? login() : register()">
         {{ type === 'login' ? 'Login' : 'Signup' }}</BaseButton>
-      </form>
+      </div>
     </div>
   </div>
 </template>

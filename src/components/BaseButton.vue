@@ -57,6 +57,8 @@ const props = withDefaults(
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
     </svg>
 
+    <slot v-if="!props.loading" name="button" />
+
     <slot />
   </button>
 </template>

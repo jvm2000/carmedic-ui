@@ -16,14 +16,24 @@ type InputProps = {
   label?: string
 
   /**
+   * If the input is required.
+   */
+  required?: boolean
+
+  /**
    * The type for the input.
    */
-  type?: string,
+  type?: string
 
   /**
    * An error message or messages value indicating whether the input is in an error state.
    */
-  error?: string | string[] | null,
+  error?: string | string[] | null
+
+  /**
+   * If the input is disabled.
+   */
+  disabled?: boolean
 }
 
 const model = defineModel({ required: false })
@@ -32,12 +42,16 @@ const props = withDefaults(
     placeholder?: InputProps['placeholder'],
     label?: InputProps['label'],
     type?: InputProps['type'],
+    required?: InputProps['required'],
     error?: InputProps['error'],
+    disabled?: InputProps['disabled'],
   }>(),
   {
     type: 'text',
+    required: false,
     error: '',
-    info: ''
+    info: '',
+    disabled: false,
   }
 )
 
@@ -58,15 +72,33 @@ function handleInput() {
 
 <template>
   <div class="flex flex-col space-y-2 w-full">
-    <label class="text-base font-medium text-black">{{ props.label }}</label>
+    <label 
+      class="text-base font-medium"
+      :class="[props.disabled ? 'text-gray-500' : 'text-black']"
+    >
+      {{ props.label }} 
+      <span v-if="props.required" class="text-red-500">*</span>
+    </label>
 
     <div class="relative flex items-center">
+      <div class="absolute left-4">
+        <slot name="icon"></slot>
+      </div>
+      
       <input 
         v-model="model"
         :type="props.type === 'password' && !isPlainText ? 'text' : props.type"
-        class="text-base outline-none px-4 py-2 ring-1 rounded-md w-full bg-gray-50"
-        :class="[errorMessage ? 'ring-1 ring-red-500 placeholder-red-500' : 'ring-gray-300']"
+        class="text-base px-4 py-2 ring-1 rounded-md w-full bg-gray-50 ring-red-50 focus:ring-blue-300 disabled:opacity-75"
+        :class="[
+          'rounded-md px-3 py-2', // base styles
+          errorMessage
+            ? 'ring-red-500 placeholder-red-500'
+            : $slots.icon
+              ? 'pl-12'
+              : 'pl-4'
+        ]"
         :placeholder="props.placeholder"
+        :disabled="props.disabled"
         @input="handleInput"
       >
 
