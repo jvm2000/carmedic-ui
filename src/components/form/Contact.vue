@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onBeforeMount, ref } from 'vue'
 import BaseButton from '../BaseButton.vue';
 import { UserIcon, EnvelopeIcon, PhoneIcon, MapPinIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import type { SignUpForm, User } from '../../types';
@@ -40,7 +40,7 @@ function initializeForm() {
   return
 }
 
-onMounted(() => {
+onBeforeMount(() => {
   fetchUserData()
 })
 </script>

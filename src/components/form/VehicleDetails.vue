@@ -1,6 +1,112 @@
 <script setup lang="ts">
-import { TruckIcon } from '@heroicons/vue/24/outline'
+import { TruckIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import BaseInput from '../BaseInput.vue';
+import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline'
+import BaseButton from '../BaseButton.vue';
+import { useForm } from '../../composables/useForm';
+import { onMounted, ref } from 'vue';
+import type { Vehicle, VehicleForm } from '../../types';
+import { dbHelper } from '../../helpers/dbHelper';
+import { useAuth } from '../../composables/useAuth';
+
+const { prevStep } = useForm()
+const { token } = useAuth()
+const images = ref<any>([])
+const previews = ref<string[]>([]) 
+const form = ref<VehicleForm>({
+  plate_number: '',
+  make: '',
+  model: '',
+  year: '',
+  registration_card_number: '',
+  images: [],
+})
+const loading = ref(false)
+const errors = ref<any>(null)
+const vehicle = ref<Vehicle | null>(null)
+
+function uploadImage() {
+  document.getElementById('profile-photo')?.click()
+}
+
+function removeImage(index: number) {
+  images.value.splice(index, 1)
+  previews.value.splice(index, 1)
+}
+
+function handleFiles(event: Event) {
+  const target = event.target as HTMLInputElement
+  const files: any = target.files
+
+  if (!files) return
+
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i]
+
+    images.value.push(file)
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      previews.value.push(e.target?.result as string)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  form.value.images = images.value
+
+  target.value = ''
+}
+
+async function fetchVehicle() {
+  const response = await dbHelper.get('/getVehicle', token.value ?? '')
+
+  vehicle.value = response.data
+
+  initializeForm()
+}
+
+function initializeForm() {
+  if (vehicle.value) {
+    form.value.plate_number = vehicle.value.plate_number || ''
+    form.value.make = vehicle.value.make || ''
+    form.value.model = vehicle.value.model || ''
+    form.value.year = vehicle.value.year || ''
+    form.value.registration_card_number = vehicle.value.registration_card_number || ''
+  }
+
+  return
+}
+
+async function submit() {
+  loading.value = true
+  errors.value = null
+
+  const formData = new FormData()
+
+  formData.append('plate_number', form.value.plate_number || '')
+  formData.append('make', form.value.make || '')
+  formData.append('model', form.value.model || '')
+  formData.append('year', form.value.year || '')
+  formData.append('registration_card_number', form.value.registration_card_number || '')
+
+  if (form.value.images && form.value.images.length > 0) {
+    for (let i = 0; i < form.value.images.length; i++) {
+      formData.append('images[]', form.value.images[i])
+    }
+  }
+
+  try {
+    await dbHelper.post('/vehicle', formData, token.value ?? '');
+  } catch (error: any) {
+    errors.value = error.response.errors
+  } finally {
+    loading.value = false
+  }
+}
+
+onMounted(() => {
+  fetchVehicle()
+})
 </script>
 
 <template>
@@ -18,16 +124,93 @@ import BaseInput from '../BaseInput.vue';
 
     <div class="grid grid-cols-2 gap-6 w-full">
       <BaseInput
+        v-model="form.make"
         label="Make"
         placeholder="Toyota"
         required
       />
 
       <BaseInput
+        v-model="form.model"
         label="Model"
         placeholder="Camry"
         required
       />
+
+      <BaseInput
+        v-model="form.year"
+        label="Year"
+        placeholder="2020"
+        required
+      />
+
+      <BaseInput
+        v-model="form.plate_number"
+        label="License Plate"
+        placeholder="ABC-1234"
+        required
+      />
+
+      <div class="col-span-2">
+        <BaseInput 
+          v-model="form.registration_card_number"
+          label="Registed Card Number"
+          placeholder="1HGBVNXXMAS1098296"
+          required
+        />
+      </div>
+
+      <div class="col-span-2 flex flex-col space-y-2">
+        <div class="flex flex-col space-y-2 w-full">
+          <label class="text-base font-medium text-black">
+            Vehicle Photos
+            <span class="text-red-500">* </span>
+            <span>(Max 5)</span>
+          </label>
+
+          <div 
+            class="relative cursor-pointer w-full border-dashed border-2 border-gray-400 rounded-lg grid place-items-center hover:border-red-500 h-36"
+             @click="uploadImage"
+          >
+            <div class="flex flex-col items-center space-y-0">
+              <ArrowUpTrayIcon class="size-8 stroke-gray-600" />
+              <span class="text-base text-gray-500">Click to upload or drag and drop</span>
+              <span class="text-sm text-gray-500">PNG, JPG up to  10MB each</span>
+            </div>
+
+            <input 
+              id="profile-photo"
+              type="file" 
+              accept="image/*" 
+              multiple 
+              @change="handleFiles" class="hidden absolute" 
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center gap-5">
+          <div 
+            v-for="src, index in previews" 
+            class="relative overflow-hidden w-56 h-36"
+            :key="index"
+          >
+            <img class="w-full object-cover" :src="src" alt="Vehicle Image Preview" />
+
+            <div 
+              class="bg-red-500 rounded-full size-6 grid place-items-center absolute top-1 right-1 cursor-pointer"
+               @click="removeImage(index)"
+            >
+              <XMarkIcon class="size-4 stroke-white" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
+      <BaseButton
+        :loading="loading"
+        @click="submit"
+      >Continue to Schedule</BaseButton>
     </div>
   </div>
 </template>

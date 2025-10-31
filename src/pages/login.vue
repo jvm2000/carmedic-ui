@@ -7,6 +7,7 @@ import { dbHelper } from '../helpers/dbHelper';
 import { getError } from '../helpers/errorHelper';
 import { useAuth } from '../composables/useAuth';
 import type { SignUpForm } from '../types';
+import { useRouter } from 'vue-router';
 
 type LoginForm = {
   email: string,
@@ -20,6 +21,7 @@ type AddressForm = {
   street_adress: string,
 }
 
+const router = useRouter()
 const type = ref('login')
 const form = ref<SignUpForm>({
   email: '',
@@ -67,6 +69,8 @@ async function login() {
     const response = await dbHelper.post('/login', loginForm.value);
 
     token.value = response.access_token
+
+    router.push('/dashboard')
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {

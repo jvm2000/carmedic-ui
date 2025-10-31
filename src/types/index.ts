@@ -7,6 +7,14 @@ export type User = {
   address: string;
 };
 
+export type Vehicle = {
+  plate_number: string;
+  make: string;
+  model: string;
+  year: string;
+  registration_card_number: string;
+  images: any[]
+};
 
 export type SignUpForm = {
   email: string;
@@ -16,4 +24,13 @@ export type SignUpForm = {
   address: string;
   password?: string;
   password_confirmation?: string;
+};
+
+export type VehicleForm = {
+  plate_number: string;
+  make: string;
+  model: string;
+  year: string;
+  registration_card_number: string;
+  images: any[]
 };

@@ -7,8 +7,13 @@ export function useForm() {
     currentStep.value += 1
   }
 
+  function prevStep() {
+    currentStep.value -= 1
+  }
+
   return {
     currentStep,
-    nextStep
+    nextStep,
+    prevStep
   };
 }
