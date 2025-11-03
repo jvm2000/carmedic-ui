@@ -5,15 +5,21 @@ import BaseStep from '../components/BaseStep.vue';
 import { useAuth } from '../composables/useAuth';
 import { useForm } from '../composables/useForm';
 import { dbHelper } from '../helpers/dbHelper';
+import { ref } from 'vue';
 
-const { currentStep } = useForm()
+const { currentStep, doneLoggedStep } = useForm()
 const { token } = useAuth()
 const router = useRouter()
+const loading = ref(false)
 
 async function logout() {
+  loading.value = true
+
   await dbHelper.post('/logout', {}, token.value ?? '');
 
   token.value = null
+
+  loading.value = false
 
   router.push('/')
 } 
@@ -25,7 +31,10 @@ async function logout() {
       <img src="/images/logo.png" alt="" class="h-16">
 
       <div>
-        <BaseButton @click="logout">
+        <BaseButton 
+          :loading="loading"
+          @click="logout"
+        >
           Logout
         </BaseButton>
       </div>
@@ -39,7 +48,7 @@ async function logout() {
             label="Customer Information"
             description="Edit your contact details"
             :selected="currentStep === 0"
-            :is-done="currentStep > 0"
+            :is-done="currentStep > 0 || doneLoggedStep > 0"
           />
 
           <BaseStep
@@ -47,7 +56,7 @@ async function logout() {
             label="Vehicle Details"
             description="Provide vehicle information and photos"
             :selected="currentStep === 1"
-            :is-done="currentStep > 1"
+            :is-done="currentStep > 1 || doneLoggedStep > 1"
           />
 
           <BaseStep
@@ -55,7 +64,7 @@ async function logout() {
             label="Schedule Deregistration"
             description="Choose appointment date and time"
             :selected="currentStep === 2"
-            :is-done="currentStep > 2"
+            :is-done="currentStep > 2 || doneLoggedStep > 2"
           />
 
           <BaseStep
@@ -63,7 +72,7 @@ async function logout() {
             label="Track Collection"
             description="Monitor your vehicle collection"
             :selected="currentStep === 3"
-            :is-done="currentStep > 3"
+            :is-done="currentStep > 3 || doneLoggedStep > 3"
           />
 
           <BaseStep

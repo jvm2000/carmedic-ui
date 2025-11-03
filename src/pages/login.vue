@@ -46,19 +46,18 @@ const loginForm = ref<LoginForm>({
 const errors = ref<any>(null)
 const loading = ref(false)
 const { token } = useAuth()
-const { currentStep } = useForm()
+const { currentStep, doneLoggedStep } = useForm()
 
 async function register() {
   loading.value = true
 
   form.value.address = fullAddress.value
 
-  type.value = 'login'
-  clearForm()
   try {
     await dbHelper.post('/register', form.value);
 
     type.value = 'login'
+    clearForm()
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -88,6 +87,7 @@ async function checkSteps() {
   const response = await dbHelper.get('/getSteps', token.value ?? '');
 
   currentStep.value = response.step
+  doneLoggedStep.value = response.step
 }
 
 function clearForm() {

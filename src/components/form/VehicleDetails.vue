@@ -65,13 +65,21 @@ function initializeForm() {
     form.value.model = vehicle.value.model || ''
     form.value.year = vehicle.value.year || ''
     form.value.registration_card_number = vehicle.value.registration_card_number || ''
+    previews.value = vehicle.value.images.map((img: string) => {
+      return `http://localhost:8000/storage/${img}`
+    })
   }
 
   return
 }
 
 async function submit() {
-  if (vehicle.value) return currentStep.value += 1
+  if (vehicle.value) {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+
+    currentStep.value += 1
+    return
+  }
   
   loading.value = true
   errors.value = null

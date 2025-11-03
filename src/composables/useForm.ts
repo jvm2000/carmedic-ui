@@ -2,6 +2,7 @@ import { ref } from "vue";
 import type { AppointmentForm, SignUpForm, VehicleForm } from '../types';
 
 const currentStep = ref(0)
+const doneLoggedStep = ref(0)
 const signupForm = ref<SignUpForm>({
   email: '',
   full_name: '',
@@ -26,14 +27,19 @@ const appointmentForm = ref<AppointmentForm>({
 export function useForm() {
   function nextStep() {
     currentStep.value += 1
+
+    window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
   function prevStep() {
     currentStep.value -= 1
+
+    window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
   return {
     currentStep,
+    doneLoggedStep,
     appointmentForm,
     signupForm,
     vehicleForm,

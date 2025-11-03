@@ -56,14 +56,16 @@ const props = withDefaults(
   <div class="flex flex-col items-center space-y-1">
     <div 
       class="size-14 grid place-items-center rounded-full"
-      :class="{
-        'bg-red-500 text-white': props.selected,
-        'bg-red-50 border border-red-500 text-black': !props.selected,
-        'bg-red-400 border border-inherit text-white': props.isDone && !props.selected,
-      }"
+      :class="[
+        props.selected && !props.isDone
+          ? 'bg-red-500 text-white border-red-500' 
+          : props.isDone 
+            ? 'bg-red-400 text-white border-red-400'
+            : 'bg-red-50 border-red-500'
+      ]"
     >
       <span 
-        v-if="!props.isDone" 
+        v-if="!props.isDone || props.selected" 
         class="text-xl font-bold"
       >{{ props.display }}</span>
 

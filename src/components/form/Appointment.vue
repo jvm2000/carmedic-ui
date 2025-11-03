@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import BaseCalendar from '../BaseCalendar.vue';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import BaseTextArea from '../BaseTextArea.vue';
 import { useForm } from '../../composables/useForm';
 import BaseButton from '../BaseButton.vue';
 import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { useVehicle } from '../../composables/useVehicle';
+import { useAppointment } from '../../composables/useAppointment';
 
 type TimeSlot = {
   label: string,
@@ -15,7 +16,8 @@ type TimeSlot = {
 }
 
 const { prevStep, currentStep, appointmentForm: form } = useForm()
-const selectedTime = ref<TimeSlot | string>('')
+const { appointment } = useAppointment()
+const selectedTime = ref<string>('')
 const timeSlots: TimeSlot[] = [
   { label: '9:00 AM', value: '09:00:00' },
   { label: '10:00 AM', value: '10:00:00' },
@@ -28,16 +30,27 @@ const timeSlots: TimeSlot[] = [
 ]
 const loading = ref(false)
 const errors = ref<any>(null)
+const { token } = useAuth()
+const { vehicle } = useVehicle()
 
 function selectTime(time: TimeSlot) {
   selectedTime.value = time.value ?? ''
 }
 
 async function submit() { 
-  const { token } = useAuth()
-  const { vehicle } = useVehicle()
+  if (appointment.value) {
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    
+    currentStep.value += 1
+    return
+  }
+
+  const dateObj = new Date()
 
   loading.value = true
+
+  form.value.scheduled_date = dateObj.toISOString().split('T')[0] ?? ''
+  form.value.scheduled_time = selectedTime.value ?? ''
 
   try {
     await dbHelper.post(`/appointment/${vehicle.value?.id}`, form.value, token.value ?? '');
@@ -49,6 +62,45 @@ async function submit() {
     loading.value = false
   }
 }
+
+async function fetchVehicle() {
+  const { currentStep } = useForm()
+
+  if (currentStep.value !== 2) return
+
+  const response = await dbHelper.get('/getVehicle', token.value ?? '')
+
+  vehicle.value = response.data
+
+  initializeForm()
+}
+
+async function fetchAppointment() {
+  await fetchVehicle()
+  
+  const { token } = useAuth()
+  const { vehicle } = useVehicle()
+
+  const response = await dbHelper.get(`/getAppointment/${vehicle.value?.id}`, token.value ?? '')
+
+  appointment.value = response.data
+
+  await initializeForm()
+}
+
+function initializeForm() {
+  if (appointment.value) {
+    form.value.scheduled_date = appointment.value.scheduled_date ?? ''
+    selectedTime.value = appointment.value.scheduled_time ?? ''
+    form.value.additional_notes = appointment.value.additional_notes ?? ''
+  }
+
+  return
+}
+
+onMounted(() => {
+  fetchAppointment()
+})
 </script>
 
 <template>

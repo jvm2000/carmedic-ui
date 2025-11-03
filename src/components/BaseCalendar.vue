@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
-import { computed, onMounted, ref } from 'vue';
+import { computed, onBeforeMount, onMounted, ref } from 'vue';
 
 const props = defineProps<{
   type?: string
@@ -86,7 +86,8 @@ function prevMonth() {
 
 async function handleOpen() {
   if (modelValue.value) {
-    const parsedDate = new Date(modelValue.value)
+    // If modelValue is a string like "2025-11-03", parse it safely
+    const parsedDate = new Date(modelValue.value + 'T00:00:00')
     if (!isNaN(parsedDate.getTime())) {
       selectedDate.value = parsedDate
       currentDate.value = parsedDate
@@ -98,8 +99,8 @@ function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms))
 }
 
-onMounted(async () => {
-  await delay(500)
+onBeforeMount(async () => {
+  await delay(1000)
   await handleOpen()
 })
 </script>
