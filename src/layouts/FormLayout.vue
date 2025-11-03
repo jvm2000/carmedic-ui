@@ -1,9 +1,22 @@
 <script setup lang="ts">
+import { useRouter } from 'vue-router';
 import BaseButton from '../components/BaseButton.vue';
 import BaseStep from '../components/BaseStep.vue';
+import { useAuth } from '../composables/useAuth';
 import { useForm } from '../composables/useForm';
+import { dbHelper } from '../helpers/dbHelper';
 
 const { currentStep } = useForm()
+const { token } = useAuth()
+const router = useRouter()
+
+async function logout() {
+  await dbHelper.post('/logout', {}, token.value ?? '');
+
+  token.value = null
+
+  router.push('/')
+} 
 </script>
 
 <template>
@@ -12,7 +25,7 @@ const { currentStep } = useForm()
       <img src="/images/logo.png" alt="" class="h-16">
 
       <div>
-        <BaseButton>
+        <BaseButton @click="logout">
           Logout
         </BaseButton>
       </div>
@@ -20,12 +33,13 @@ const { currentStep } = useForm()
 
     <div class="flex flex-col items-center w-full py-40 space-y-8">
       <div class="max-w-4xl w-full flex flex-col items-start space-y-6">
-        <div class="flex items-center gap-6">
+        <div class="flex items-start gap-6">
           <BaseStep
             display="1"
             label="Customer Information"
             description="Edit your contact details"
             :selected="currentStep === 0"
+            :is-done="currentStep > 0"
           />
 
           <BaseStep
@@ -33,24 +47,31 @@ const { currentStep } = useForm()
             label="Vehicle Details"
             description="Provide vehicle information and photos"
             :selected="currentStep === 1"
+            :is-done="currentStep > 1"
           />
 
           <BaseStep
             display="3"
             label="Schedule Deregistration"
             description="Choose appointment date and time"
+            :selected="currentStep === 2"
+            :is-done="currentStep > 2"
           />
 
           <BaseStep
             display="4"
             label="Track Collection"
             description="Monitor your vehicle collection"
+            :selected="currentStep === 3"
+            :is-done="currentStep > 3"
           />
 
           <BaseStep
             display="5"
             label="Payment"
             description="Receive your compensation"
+            :selected="currentStep === 4"
+            :is-done="currentStep > 4"
           />
         </div>
 

@@ -8,6 +8,7 @@ export type User = {
 };
 
 export type Vehicle = {
+  id?: string
   plate_number: string;
   make: string;
   model: string;
@@ -15,6 +16,14 @@ export type Vehicle = {
   registration_card_number: string;
   images: any[]
 };
+
+export type Appointment = {
+  vehicle_id: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  additional_notes: string;
+  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}
 
 export type SignUpForm = {
   email: string;
@@ -34,3 +43,11 @@ export type VehicleForm = {
   registration_card_number: string;
   images: any[]
 };
+
+export type AppointmentForm = {
+  vehicle_id?: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  additional_notes: string;
+  status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+}

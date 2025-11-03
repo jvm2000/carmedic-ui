@@ -8,6 +8,7 @@ import { getError } from '../helpers/errorHelper';
 import { useAuth } from '../composables/useAuth';
 import type { SignUpForm } from '../types';
 import { useRouter } from 'vue-router';
+import { useForm } from '../composables/useForm';
 
 type LoginForm = {
   email: string,
@@ -45,15 +46,19 @@ const loginForm = ref<LoginForm>({
 const errors = ref<any>(null)
 const loading = ref(false)
 const { token } = useAuth()
+const { currentStep } = useForm()
 
 async function register() {
   loading.value = true
-  errors.value = null
 
   form.value.address = fullAddress.value
 
+  type.value = 'login'
+  clearForm()
   try {
     await dbHelper.post('/register', form.value);
+
+    type.value = 'login'
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -70,12 +75,40 @@ async function login() {
 
     token.value = response.access_token
 
+    await checkSteps()
     router.push('/dashboard')
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
     loading.value = false
   }
+}
+
+async function checkSteps() {
+  const response = await dbHelper.get('/getSteps', token.value ?? '');
+
+  currentStep.value = response.step
+}
+
+function clearForm() {
+  form.value = {
+    email: '',
+    full_name: '',
+    phone_number: '',
+    whatsapp_number: '',
+    address: '',
+    password: '',
+    password_confirmation: ''
+  }
+
+  addressForm.value = {
+    state: '',
+    city: '',
+    postal_code: '',
+    street_adress: ''
+  }
+
+  errors.value = null
 }
 
 const fullAddress = computed(() => {

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { CheckIcon } from '@heroicons/vue/24/outline'
+
 type StepProps = {
   /**
    * Step dispay.
@@ -21,6 +23,11 @@ type StepProps = {
   selected?: boolean,
 
   /**
+   * If the step is done.
+   */
+  isDone?: boolean,
+
+  /**
    * If the button is disabled.
    */
   disabled?: boolean,
@@ -32,11 +39,13 @@ const props = withDefaults(
     label?: StepProps['label'],
     description?: StepProps['description'],
     selected?: StepProps['selected'],
+    isDone?: StepProps['isDone'],
     disabled?: StepProps['disabled'],
   }>(),
   {
     display: 'primary',
     selected: false,
+    isDone: false,
     disabled: false,
     loaading: false
   }
@@ -47,9 +56,21 @@ const props = withDefaults(
   <div class="flex flex-col items-center space-y-1">
     <div 
       class="size-14 grid place-items-center rounded-full"
-      :class="[props.selected ? 'bg-red-500 text-white' : 'bg-red-50 border border-red-500 text-black']"
+      :class="{
+        'bg-red-500 text-white': props.selected,
+        'bg-red-50 border border-red-500 text-black': !props.selected,
+        'bg-red-400 border border-inherit text-white': props.isDone && !props.selected,
+      }"
     >
-      <span class="text-xl font-bold">{{ props.display }}</span>
+      <span 
+        v-if="!props.isDone" 
+        class="text-xl font-bold"
+      >{{ props.display }}</span>
+
+      <CheckIcon 
+        v-if="props.isDone && !props.selected" 
+        class="size-6 stroke-white"
+      />
     </div>
 
     <p 

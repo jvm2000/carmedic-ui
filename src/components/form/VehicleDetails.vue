@@ -4,26 +4,19 @@ import BaseInput from '../BaseInput.vue';
 import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '../BaseButton.vue';
 import { useForm } from '../../composables/useForm';
+import { useVehicle } from '../../composables/useVehicle';
 import { onMounted, ref } from 'vue';
-import type { Vehicle, VehicleForm } from '../../types';
 import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
+import { getError } from '../../helpers/errorHelper';
 
-const { prevStep } = useForm()
 const { token } = useAuth()
 const images = ref<any>([])
 const previews = ref<string[]>([]) 
-const form = ref<VehicleForm>({
-  plate_number: '',
-  make: '',
-  model: '',
-  year: '',
-  registration_card_number: '',
-  images: [],
-})
 const loading = ref(false)
 const errors = ref<any>(null)
-const vehicle = ref<Vehicle | null>(null)
+const { currentStep, prevStep, vehicleForm: form } = useForm()
+const { vehicle } = useVehicle()
 
 function uploadImage() {
   document.getElementById('profile-photo')?.click()
@@ -78,6 +71,8 @@ function initializeForm() {
 }
 
 async function submit() {
+  if (vehicle.value) return currentStep.value += 1
+  
   loading.value = true
   errors.value = null
 
@@ -97,6 +92,8 @@ async function submit() {
 
   try {
     await dbHelper.post('/vehicle', formData, token.value ?? '');
+
+    currentStep.value += 1
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -128,6 +125,7 @@ onMounted(() => {
         label="Make"
         placeholder="Toyota"
         required
+        :error="getError(errors, 'make')"
       />
 
       <BaseInput
@@ -135,6 +133,7 @@ onMounted(() => {
         label="Model"
         placeholder="Camry"
         required
+        :error="getError(errors, 'model')"
       />
 
       <BaseInput
@@ -142,6 +141,7 @@ onMounted(() => {
         label="Year"
         placeholder="2020"
         required
+        :error="getError(errors, 'year')"
       />
 
       <BaseInput
@@ -149,6 +149,7 @@ onMounted(() => {
         label="License Plate"
         placeholder="ABC-1234"
         required
+        :error="getError(errors, 'plate_number')"
       />
 
       <div class="col-span-2">
@@ -157,6 +158,7 @@ onMounted(() => {
           label="Registed Card Number"
           placeholder="1HGBVNXXMAS1098296"
           required
+          :error="getError(errors, 'registration_card_number')"
         />
       </div>
 
@@ -186,12 +188,16 @@ onMounted(() => {
               @change="handleFiles" class="hidden absolute" 
             />
           </div>
+
+          <span v-if="getError(errors, 'images')" class="text-xs text-red-500">
+            {{ getError(errors, 'images') }}
+          </span>
         </div>
 
         <div class="flex items-center gap-5">
           <div 
             v-for="src, index in previews" 
-            class="relative overflow-hidden w-56 h-36"
+            class="relative overflow-hidden w-56 h-36 rounded-lg"
             :key="index"
           >
             <img class="w-full object-cover" :src="src" alt="Vehicle Image Preview" />

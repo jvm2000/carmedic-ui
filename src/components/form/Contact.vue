@@ -2,23 +2,16 @@
 import { onBeforeMount, ref } from 'vue'
 import BaseButton from '../BaseButton.vue';
 import { UserIcon, EnvelopeIcon, PhoneIcon, MapPinIcon, PencilIcon } from '@heroicons/vue/24/outline'
-import type { SignUpForm, User } from '../../types';
 import { useAuth } from '../../composables/useAuth';
 import { dbHelper } from '../../helpers/dbHelper';
 import BaseInput from '../BaseInput.vue';
 import { useForm } from '../../composables/useForm';
+import type { User } from '../../types';
 
 const isDisabled = ref(false)
 const user = ref<User | null>(null)
-const form = ref<SignUpForm>({
-  email: '',
-  full_name: '',
-  phone_number: '',
-  whatsapp_number: '',
-  address: '',
-})
 const { token } = useAuth()
-const { nextStep } = useForm()
+const { nextStep, signupForm: form } = useForm()
 
 async function fetchUserData() {
   const response = await dbHelper.get('/get', token.value ?? '')
