@@ -23,7 +23,7 @@ function goToLogin() {
       </p>
 
       <div>
-        <BaseButton class="rounded-full">Get Started</BaseButton>
+        <BaseButton class="rounded-full" @click="goToLogin">Get Started</BaseButton>
       </div>
     </div>
 

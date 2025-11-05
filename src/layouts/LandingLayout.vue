@@ -1,5 +1,12 @@
 <script setup lang="ts">
 import BaseButton from '../components/BaseButton.vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToLogin() {
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -14,7 +21,7 @@ import BaseButton from '../components/BaseButton.vue'
       </div>
 
       <div>
-        <BaseButton>
+        <BaseButton @click="goToLogin">
           Login
         </BaseButton>
       </div>
