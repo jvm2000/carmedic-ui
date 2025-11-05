@@ -2,6 +2,13 @@
 import BaseButton from '../components/BaseButton.vue';
 import LandingLayout from '../layouts/LandingLayout.vue';
 import { CheckCircleIcon, TruckIcon, BanknotesIcon } from '@heroicons/vue/24/outline'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+function goToLogin() {
+  router.push('/login')
+}
 </script>
 
 <template>
@@ -154,6 +161,13 @@ import { CheckCircleIcon, TruckIcon, BanknotesIcon } from '@heroicons/vue/24/out
       <p class="text-xl text-center text-white max-w-2xl">
         Join thousands of satisfied customers who have deregistered their vehicles with us
       </p>
+
+      <button 
+        class="justify-center w-72 p-4 bg-white rounded-full text-red-500 font-medium text-xl"
+        @click="goToLogin"
+      >
+        Start your Application
+      </button>
     </div>
   </LandingLayout>
 </template>

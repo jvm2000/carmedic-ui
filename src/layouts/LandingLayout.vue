@@ -23,6 +23,39 @@ import BaseButton from '../components/BaseButton.vue'
     <div class="mt-24">
       <slot />
     </div>
+
+    <div class="bg-gray-900 py-12 px-24 flex flex-col items-center space-y-6 divide-y divide-gray-50/10 w-full">
+      <div class="grid grid-cols-3 w-full">
+        <div class="flex flex-col items-start space-y-6">
+          <img src="/images/logo.png" alt="" class="h-16">
+
+          <p class="text-base text-white max-w-sm">Making vehicle deregistration simple, fast, and stress-free.</p>
+        </div>
+
+        <div class="flex flex-col items-start space-y-6">
+          <p class="text-base text-white font-bold">Quick Links</p>
+
+          <div class="space-y-4">
+            <p class="text-base text-white">How It Works</p>
+            <p class="text-base text-white">Services</p>
+            <p class="text-base text-white">Get Started</p>
+          </div>
+        </div>
+
+        <div class="flex flex-col items-start space-y-6">
+          <p class="text-base text-white font-bold">Contact Us</p>
+
+          <div class="space-y-4">
+            <p class="text-base text-white">Email: office@carmedic.com.my</p>
+            <p class="text-base text-white">Phone: 03-8920 7555</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-base text-gray-50 w-full text-center pt-8">
+        © 2025 Car Medic Malaysia. All rights reserved.
+      </p>
+    </div>
   </div>
 </template>
 
