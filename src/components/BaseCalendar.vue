@@ -1,10 +1,6 @@
 <script setup lang="ts">
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
-import { computed, onBeforeMount, onMounted, ref } from 'vue';
-
-const props = defineProps<{
-  type?: string
-}>()
+import { computed, onBeforeMount, ref } from 'vue';
 
 const selectedDate = ref<Date | null>(null)
 const currentDate = ref(new Date())

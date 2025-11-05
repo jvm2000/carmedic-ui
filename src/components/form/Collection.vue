@@ -3,7 +3,7 @@ import { TruckIcon, MapPinIcon, CheckCircleIcon, ClockIcon, ChatBubbleLeftIcon }
 import { useForm } from '../../composables/useForm';
 import BaseButton from '../BaseButton.vue';
 
-const { prevStep, currentStep, appointmentForm: form } = useForm()
+const { prevStep } = useForm()
 </script>
 
 <template>

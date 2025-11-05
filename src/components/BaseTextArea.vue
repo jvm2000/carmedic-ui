@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import { ref, watch } from 'vue';
 
 defineOptions({ inheritAttrs: false })
@@ -56,7 +55,6 @@ const props = withDefaults(
 )
 
 const errorMessage = ref<string[] | string | null>('')
-const isPlainText = ref(true)
 
 watch(
   () => props.error,
