@@ -11,14 +11,9 @@ function goToLogin() {
 
 <template>
   <div class="w-full relative web">
-    <div class="w-full flex items-center justify-between bg-white px-24 py-4 fixed top-0 z-[9999]">
-      <img src="/images/logo.png" alt="" class="h-16">
-
-      <div class="flex items-center gap-4">
-        <a href="" class="text-base text-black">How It Works</a>
-        <a href="" class="text-base text-black">Services</a>
-        <a href="" class="text-base text-black">Contact Us</a>
-      </div>
+    <div class="w-full flex items-center justify-between bg-white px-6 md:px-12 lg:px-24 py-4 fixed top-0 z-[9999]">
+      <img src="/images/logo.png" alt="" class="h-16 hidden sm:block">
+      <img src="/images/logo_mobile.png" alt="" class="h-16 block sm:hidden">
 
       <div>
         <BaseButton @click="goToLogin">
@@ -31,22 +26,13 @@ function goToLogin() {
       <slot />
     </div>
 
-    <div class="bg-gray-900 py-12 px-24 flex flex-col items-center space-y-6 divide-y divide-gray-50/10 w-full">
-      <div class="grid grid-cols-3 w-full">
+    <div class="bg-gray-900 py-12 px-6 md:px-12 lg:px-24 flex flex-col items-center space-y-6 divide-y divide-gray-50/10 w-full">
+      <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-6 lg:gap-0">
         <div class="flex flex-col items-start space-y-6">
-          <img src="/images/logo.png" alt="" class="h-16">
+          <img src="/images/logo.png" alt="" class="h-16 hidden sm:block">
+          <img src="/images/logo_mobile.png" alt="" class="h-24 block sm:hidden">
 
           <p class="text-base text-white max-w-sm">Making vehicle deregistration simple, fast, and stress-free.</p>
-        </div>
-
-        <div class="flex flex-col items-start space-y-6">
-          <p class="text-base text-white font-bold">Quick Links</p>
-
-          <div class="space-y-4">
-            <p class="text-base text-white">How It Works</p>
-            <p class="text-base text-white">Services</p>
-            <p class="text-base text-white">Get Started</p>
-          </div>
         </div>
 
         <div class="flex flex-col items-start space-y-6">

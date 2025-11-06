@@ -13,12 +13,12 @@ function goToLogin() {
 
 <template>
   <LandingLayout>
-    <div class="py-24 w-full flex flex-col items-center space-y-8">
-      <p class="text-7xl text-black font-bold text-center max-w-5xl">
+    <div class="py-24 w-full flex flex-col sm:items-center space-y-8 px-6 sm:px-0">
+      <p class="text-5xl lg:text-7xl text-black font-bold sm:text-center max-w-2xl lg:max-w-5xl">
         How to Deregister and Dispose of Your Car
       </p>
 
-      <p class="text-3xl text-red-500 font-bold max-w-4xl text-center">
+      <p class="text-2xl lg:text-3xl text-red-500 font-medium sm:font-bold max-w-4xl sm:text-center">
         If you need to deregister and dispose of your car, we've made the process simple and stress-free. Just follow these easy steps:
       </p>
 
@@ -27,7 +27,7 @@ function goToLogin() {
       </div>
     </div>
 
-    <div class="py-12 grid grid-cols-3 gap-6 px-24">
+    <div class="py-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-6 md:px-12 lg:px-24">
       <div class="w-full bg-white rounded-lg p-6 border-t-8 border-red-500 h-80 shadow-md flex flex-col items-start justify-between">
         <div class="size-20 bg-red-500 grid place-items-center rounded-full">
           <span class="text-4xl text-white font-bold">1</span>
@@ -116,7 +116,7 @@ function goToLogin() {
     <div class="py-16 bg-white flex flex-col items-center space-y-16 w-full">
       <p class="text-5xl text-black font-bold">Why Choose Us?</p>
 
-      <div class="max-w-6xl w-full grid grid-cols-3 gap-x-8">
+      <div class="max-w-6xl w-full grid grid-cols-1 sm:grid-cols-3 gap-8">
         <div class="flex flex-col items-center space-y-6">
           <div class="size-20 bg-red-500 grid place-items-center rounded-full">
             <CheckCircleIcon class="size-14 stroke-white" />
@@ -155,15 +155,15 @@ function goToLogin() {
       </div>
     </div>
 
-    <div class="py-16 bg-red-500 flex flex-col items-center w-full space-y-8">
+    <div class="py-16 bg-red-500 flex flex-col sm:items-center w-full space-y-8 px-6 sm:px-0">
       <p class="text-5xl font-bold text-white">Ready to Get Started?</p>
 
-      <p class="text-xl text-center text-white max-w-2xl">
+      <p class="text-xl sm:text-center text-white max-w-2xl">
         Join thousands of satisfied customers who have deregistered their vehicles with us
       </p>
 
       <button 
-        class="justify-center w-72 p-4 bg-white rounded-full text-red-500 font-medium text-xl"
+        class="justify-center sm:w-72 p-4 bg-white rounded-full text-red-500 font-medium text-xl"
         @click="goToLogin"
       >
         Start your Application
