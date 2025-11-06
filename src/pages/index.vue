@@ -1,14 +1,19 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import BaseButton from '../components/BaseButton.vue';
+import { useForm } from '../composables/useForm';
 import LandingLayout from '../layouts/LandingLayout.vue';
 import { CheckCircleIcon, TruckIcon, BanknotesIcon } from '@heroicons/vue/24/outline'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+const { setTitle } = useForm()
 
 function goToLogin() {
   router.push('/login')
 }
+
+onMounted(() => { setTitle('Welcome') })
 </script>
 
 <template>

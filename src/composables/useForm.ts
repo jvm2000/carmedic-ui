@@ -1,4 +1,4 @@
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import type { AppointmentForm, SignUpForm, VehicleForm } from '../types';
 
 const currentStep = ref(0)
@@ -24,6 +24,13 @@ const appointmentForm = ref<AppointmentForm>({
   additional_notes: '',
 })
 
+const titleChuck = computed(() => {
+  if (currentStep.value === 0) return 'Customer Information'
+  if (currentStep.value === 1) return 'Vehicle Details'
+  if (currentStep.value === 2) return 'Schedule Deregistration'
+  if (currentStep.value === 3) return 'Track Collection'
+})
+
 export function useForm() {
   function nextStep() {
     currentStep.value += 1
@@ -37,13 +44,32 @@ export function useForm() {
     window.scrollTo({ top: 0, behavior: 'auto' })
   }
 
+  function setTitle(titleChunk: string | null) {
+    document.title = titleChunk
+      ? `${titleChunk} · CarMedic`
+      : 'CarMedic'
+  }
+
+  function setFavicon(href: string) {
+    let link: HTMLLinkElement | null = document.querySelector("link[rel~='icon']")
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'icon'
+      document.head.appendChild(link)
+    }
+    link.href = href
+  }
+
   return {
     currentStep,
     doneLoggedStep,
     appointmentForm,
     signupForm,
     vehicleForm,
+    titleChuck,
     nextStep,
-    prevStep
+    prevStep,
+    setTitle,
+    setFavicon
   };
 }

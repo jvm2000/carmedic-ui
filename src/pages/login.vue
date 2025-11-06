@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
 import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
 import BaseCombobox from '../components/BaseCombobox.vue';
@@ -46,7 +46,7 @@ const loginForm = ref<LoginForm>({
 const errors = ref<any>(null)
 const loading = ref(false)
 const { token } = useAuth()
-const { currentStep, doneLoggedStep } = useForm()
+const { currentStep, doneLoggedStep, setTitle } = useForm()
 
 async function register() {
   loading.value = true
@@ -113,6 +113,15 @@ function clearForm() {
 
 const fullAddress = computed(() => {
   return `${addressForm.value.street_adress} ${addressForm.value.city}, ${addressForm.value.state}, ${addressForm.value.postal_code}`
+})
+
+const titleComputed = computed(() => {
+  if (type.value === 'login') return 'Login'
+  if (type.value === 'signup') return 'Signup'
+})
+
+watchEffect(() => {
+  setTitle(`${titleComputed.value}`)
 })
 </script>
 

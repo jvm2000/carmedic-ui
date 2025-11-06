@@ -5,9 +5,9 @@ import BaseStep from '../components/BaseStep.vue';
 import { useAuth } from '../composables/useAuth';
 import { useForm } from '../composables/useForm';
 import { dbHelper } from '../helpers/dbHelper';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 
-const { currentStep, doneLoggedStep } = useForm()
+const { currentStep, setTitle, titleChuck } = useForm()
 const { token } = useAuth()
 const router = useRouter()
 const loading = ref(false)
@@ -23,6 +23,10 @@ async function logout() {
 
   router.push('/')
 } 
+
+watchEffect(() => {
+  setTitle(`${titleChuck.value}`)
+})
 </script>
 
 <template>
