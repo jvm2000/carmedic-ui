@@ -116,7 +116,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <div class="grid grid-cols-2 w-full gap-x-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-x-6">
       <BaseCalendar
         v-model="form.scheduled_date"
       />
@@ -132,7 +132,7 @@ onMounted(() => {
         <button 
           v-for="time in timeSlots"
           :class="[
-            'w-48 justify-center py-2 text-base rounded-md border transition-colors',
+            'w-24 sm:w-48 justify-center py-2 text-sm sm:text-base rounded-md border transition-colors',
             selectedTime === time.value
               ? 'bg-red-500 text-white border-red-600'
               : 'bg-gray-50 text-black border-gray-300 hover:bg-gray-100'
@@ -152,8 +152,13 @@ onMounted(() => {
     />
 
     <div class="grid grid-cols-2 gap-6 w-full">
-      <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
-      <BaseButton @click="submit">Continue to Track Collection</BaseButton>
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton @click="submit">Continue to Track Collection</BaseButton>
+      </div>
     </div>
   </div>
 </template>

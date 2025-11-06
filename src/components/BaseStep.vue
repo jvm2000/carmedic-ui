@@ -53,9 +53,9 @@ const props = withDefaults(
 </script>
 
 <template>
-  <div class="flex flex-col items-center space-y-1">
+  <div class="flex flex-col sm:items-center space-y-1">
     <div 
-      class="size-14 grid place-items-center rounded-full"
+      class="size-20 sm:size-14 grid place-items-center rounded-full mb-4 sm:mb-0"
       :class="[
         props.selected && !props.isDone
           ? 'bg-red-500 text-white border-red-500' 
@@ -66,7 +66,7 @@ const props = withDefaults(
     >
       <span 
         v-if="!props.isDone || props.selected" 
-        class="text-xl font-bold"
+        class="text-2xl sm:text-xl font-bold"
       >{{ props.display }}</span>
 
       <CheckIcon 
@@ -76,12 +76,12 @@ const props = withDefaults(
     </div>
 
     <p 
-      class="text-sm text-black text-center"
+      class="text-lg sm:text-sm text-black sm:text-center"
       :class="[props.selected ? 'font-medium' : '']"
     >{{ props.label }}</p>
 
     <p 
-      class="text-sm text-gray-800 text-center"
+      class="text-lg sm:text-sm text-gray-800 sm:text-center"
     >{{ props.description }}</p>
   </div>
 </template>

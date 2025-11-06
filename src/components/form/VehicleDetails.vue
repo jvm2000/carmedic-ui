@@ -128,37 +128,45 @@ onMounted(() => {
     </div>
 
     <div class="grid grid-cols-2 gap-6 w-full">
-      <BaseInput
-        v-model="form.make"
-        label="Make"
-        placeholder="Toyota"
-        required
-        :error="getError(errors, 'make')"
-      />
+      <div class="col-span-2 sm:col-span-1">
+        <BaseInput
+          v-model="form.make"
+          label="Make"
+          placeholder="Toyota"
+          required
+          :error="getError(errors, 'make')"
+        />
+      </div>
 
-      <BaseInput
-        v-model="form.model"
-        label="Model"
-        placeholder="Camry"
-        required
-        :error="getError(errors, 'model')"
-      />
+      <div class="col-span-2 sm:col-span-1">
+        <BaseInput
+          v-model="form.model"
+          label="Model"
+          placeholder="Camry"
+          required
+          :error="getError(errors, 'model')"
+        />
+      </div>
 
-      <BaseInput
-        v-model="form.year"
-        label="Year"
-        placeholder="2020"
-        required
-        :error="getError(errors, 'year')"
-      />
+      <div class="col-span-2 sm:col-span-1">
+        <BaseInput
+          v-model="form.year"
+          label="Year"
+          placeholder="2020"
+          required
+          :error="getError(errors, 'year')"
+        />
+      </div>
 
-      <BaseInput
-        v-model="form.plate_number"
-        label="License Plate"
-        placeholder="ABC-1234"
-        required
-        :error="getError(errors, 'plate_number')"
-      />
+      <div class="col-span-2 sm:col-span-1">
+        <BaseInput
+          v-model="form.plate_number"
+          label="License Plate"
+          placeholder="ABC-1234"
+          required
+          :error="getError(errors, 'plate_number')"
+        />
+      </div>
 
       <div class="col-span-2">
         <BaseInput 
@@ -220,11 +228,16 @@ onMounted(() => {
         </div>
       </div>
 
-      <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
-      <BaseButton
-        :loading="loading"
-        @click="submit"
-      >Continue to Schedule</BaseButton>
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton
+          :loading="loading"
+          @click="submit"
+        >Continue to Schedule</BaseButton>
+      </div>
     </div>
   </div>
 </template>

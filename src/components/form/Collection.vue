@@ -7,7 +7,7 @@ const { prevStep } = useForm()
 </script>
 
 <template>
-  <div class="w-full bg-white rounded-lg p-6 flex flex-col items-start space-y-6">
+  <div class="w-full bg-white rounded-lg p-6 px-4 sm:px-6 flex flex-col items-start space-y-6">
     <div class="w-full flex items-start justify-between">
       <div>
         <div class="flex items-center space-x-2">
@@ -96,8 +96,13 @@ const { prevStep } = useForm()
     </div>
 
     <div class="grid grid-cols-2 gap-6 w-full">
-      <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
-      <BaseButton>Continue to Payment</BaseButton>
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton type="secondary" @click="prevStep">Back</BaseButton>
+      </div>
+
+      <div class="col-span-2 sm:col-span-1">
+        <BaseButton>Continue to Payment</BaseButton>
+      </div>
     </div>
   </div>
 </template>

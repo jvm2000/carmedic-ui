@@ -194,7 +194,7 @@ const fullAddress = computed(() => {
             label="State"
           />
 
-          <div class="flex items-center gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <BaseInput
               v-model="addressForm.city"
               label="City"
