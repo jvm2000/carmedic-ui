@@ -66,7 +66,7 @@ function initializeForm() {
     form.value.year = vehicle.value.year || ''
     form.value.registration_card_number = vehicle.value.registration_card_number || ''
     previews.value = vehicle.value.images.map((img: string) => {
-      return `http://localhost:8000/storage/${img}`
+      return `https://abledonline.com/carmedicdirectory/api/public_html/storage/${img}`
     })
   }
 

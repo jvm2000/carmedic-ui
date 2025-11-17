@@ -42,7 +42,7 @@ const filteredOptions = computed(() =>
 )
 
 async function getStates() {
-  const response = await fetch("http://localhost:8000/api/states")
+  const response = await fetch("https://abledonline.com/carmedicdirectory/api/public_html//states")
 
   const data = await response.json()
 
