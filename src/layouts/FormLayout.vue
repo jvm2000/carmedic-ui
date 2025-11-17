@@ -7,7 +7,7 @@ import { useForm } from '../composables/useForm';
 import { dbHelper } from '../helpers/dbHelper';
 import { ref, watchEffect } from 'vue';
 
-const { currentStep, setTitle, titleChuck } = useForm()
+const { currentStep, setTitle, titleChuck, doneLoggedStep } = useForm()
 const { token } = useAuth()
 const router = useRouter()
 const loading = ref(false)

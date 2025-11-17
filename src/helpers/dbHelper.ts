@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8000/api'; // Laravel API URL
+const API_BASE_URL = 'https://abledonline.com/carmedicdirectory/api/public_html/api'; // Laravel API URL
 
 interface FetchOptions {
   method: string;
