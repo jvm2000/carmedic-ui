@@ -17,7 +17,7 @@ function goToLogin() {
 
       <div>
         <BaseButton @click="goToLogin">
-          Login
+          Login/Register
         </BaseButton>
       </div>
     </div>

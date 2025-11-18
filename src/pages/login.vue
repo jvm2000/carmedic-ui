@@ -157,6 +157,7 @@ watchEffect(() => {
             label="Email"
             placeholder="your@email.com"
             :error="getError(errors, 'email')"
+            required
           />
 
           <BaseInput 
@@ -165,6 +166,7 @@ watchEffect(() => {
             label="Password"
             placeholder="**********"
             :error="getError(errors, 'password')"
+            required
           />
         </div>
 
@@ -175,6 +177,7 @@ watchEffect(() => {
             label="Email"
             placeholder="your@email.com"
             :error="getError(errors, 'email')"
+            required
           />
 
           <BaseInput 
@@ -182,6 +185,7 @@ watchEffect(() => {
             label="Full Name"
             placeholder="John Doe"
             :error="getError(errors, 'full_name')"
+            required
           />
 
           <BaseInput 
@@ -189,6 +193,7 @@ watchEffect(() => {
             label="Phone Number"
             placeholder="+60 000 000 000"
             :error="getError(errors, 'phone_number')"
+            required
           />
 
           <BaseInput 
@@ -196,11 +201,14 @@ watchEffect(() => {
             label="Whatsapp Number"
             placeholder="+60 000 000 000"
             :error="getError(errors, 'whatsapp_number')"
+            required
           />
 
           <BaseCombobox 
             v-model="addressForm.state"
             label="State"
+            required
+            :error="getError(errors, 'state')"
           />
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -208,12 +216,16 @@ watchEffect(() => {
               v-model="addressForm.city"
               label="City"
               placeholder="City"
+              required
+              :error="getError(errors, 'city')"
             />
 
             <BaseInput
               v-model="addressForm.postal_code"
               label="Postal Code"
               placeholder="Postal Code"
+              required
+              :error="getError(errors, 'postal_code')"
             />
           </div>
 
@@ -221,6 +233,8 @@ watchEffect(() => {
             v-model="addressForm.street_adress"
             label="Address"
             placeholder="123, Jalan Example"
+            required
+            :error="getError(errors, 'street_adress')"
           />
 
           <BaseInput 
@@ -229,6 +243,7 @@ watchEffect(() => {
             label="Password"
             placeholder="**********"
             :error="getError(errors, 'password')"
+            required
           />
 
           <BaseInput 
@@ -237,6 +252,7 @@ watchEffect(() => {
             label="Confirm Password"
             placeholder="**********"
             :error="getError(errors, 'password')"
+            required
           />
         </div>
 
