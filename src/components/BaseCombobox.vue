@@ -1,6 +1,6 @@
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot } from '@headlessui/vue'
 import { ChevronUpDownIcon } from '@heroicons/vue/20/solid'
 
@@ -14,6 +14,16 @@ type ComboboxProps = {
    * The label for the combobox
    */
   label?: string,
+
+  /**
+   * An error message or messages value indicating whether the combobox is in an error state.
+   */
+  error?: string | string[] | null
+
+  /**
+   * If the combobox is required
+   */
+  required?: boolean,
 }
 
 const model = defineModel<any>({ required: false })
@@ -21,15 +31,32 @@ const props = withDefaults(
   defineProps < {
     placeholder?: ComboboxProps['placeholder'],
     label?: ComboboxProps['label'],
+    error?: ComboboxProps['error'],
+    required?: ComboboxProps['required'],
   }>(),
   {
     placeholder: 'Seletc a state',
-    label: ''
+    label: '',
+    error: '',
+    required: false
   }
 )
 
 const states = ref<any>([])
 const query = ref('')
+const errorMessage = ref<string[] | string | null>('')
+
+watch(
+  () => props.error,
+  (value) => {
+    errorMessage.value = value
+  }
+)
+
+function handleCombobox() {
+  errorMessage.value = ''
+}
+
 const filteredOptions = computed(() =>
   query.value === ''
     ? states.value
@@ -54,7 +81,7 @@ onMounted(() => getStates())
 
 <template>
   <div class="flex flex-col space-y-2 w-full">
-    <label class="text-base font-medium text-black">{{ props.label }}</label>
+    <label class="text-base font-medium text-black">{{ props.label }} <span v-if="props.required" class="text-red-500">*</span></label>
 
     <Combobox v-model="model">
       <div class="relative mt-1">
@@ -63,9 +90,11 @@ onMounted(() => getStates())
         >
           <ComboboxInput
             class="text-base ring-0 focus:ring-0 outline-none px-4 py-2 border border-gray-300 rounded-md w-full bg-gray-50"
+            :class="[errorMessage ? 'border-red-500 placeholder-red-500' : '']"
             :displayValue="(option: any) =>  option"
             :placeholder="props.placeholder"
             @change="query = $event.target.value"
+            @input="handleCombobox"
           />
           <ComboboxButton
             class="absolute inset-y-0 right-0 flex items-center pr-2"
@@ -118,5 +147,7 @@ onMounted(() => getStates())
         </TransitionRoot>
       </div>
     </Combobox>
+
+    <p v-if="errorMessage" class="text-xs text-red-500">{{ errorMessage }}</p>
   </div>
 </template> 
