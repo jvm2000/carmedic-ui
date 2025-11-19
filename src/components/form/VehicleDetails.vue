@@ -9,6 +9,7 @@ import { onMounted, ref } from 'vue';
 import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { getError } from '../../helpers/errorHelper';
+import BaseCombobox from '../BaseCombobox.vue';
 
 const { token } = useAuth()
 const images = ref<any>([])
@@ -16,13 +17,23 @@ const previews = ref<string[]>([])
 const loading = ref(false)
 const errors = ref<any>(null)
 const { currentStep, prevStep, vehicleForm: form } = useForm()
+const errorMessage = ref('')
 const { vehicle } = useVehicle()
+const makes = ref<any>([])
+
+async function getMakes() {
+  const response = await dbHelper.get('/makes')
+
+  makes.value = response
+}
 
 function uploadImage() {
   document.getElementById('profile-photo')?.click()
 }
 
 function removeImage(index: number) {
+  if (images.value.length > 5) errorMessage.value = ''
+
   images.value.splice(index, 1)
   previews.value.splice(index, 1)
 }
@@ -32,6 +43,14 @@ function handleFiles(event: Event) {
   const files: any = target.files
 
   if (!files) return
+
+  if (images.value.length + files.length > 5) {
+    errorMessage.value = 'You can only upload a maximum of 5 images.'
+    target.value = ''
+    return
+  }
+
+  errorMessage.value = ''
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i]
@@ -66,7 +85,7 @@ function initializeForm() {
     form.value.year = vehicle.value.year || ''
     form.value.registration_card_number = vehicle.value.registration_card_number || ''
     previews.value = vehicle.value.images.map((img: string) => {
-      return `https://abledonline.com/carmedicdirectory/api/public_html/storage/${img}`
+      return `${import.meta.env.BASE_URL}/storage/${img}`
     })
   }
 
@@ -110,6 +129,7 @@ async function submit() {
 }
 
 onMounted(() => {
+  getMakes(),
   fetchVehicle()
 })
 </script>
@@ -129,10 +149,11 @@ onMounted(() => {
 
     <div class="grid grid-cols-2 gap-6 w-full">
       <div class="col-span-2 sm:col-span-1">
-        <BaseInput
+        <BaseCombobox 
           v-model="form.make"
+          :options="makes"
           label="Make"
-          placeholder="Toyota"
+          placeholder="Select a Make"
           required
           :error="getError(errors, 'make')"
         />
@@ -171,7 +192,7 @@ onMounted(() => {
       <div class="col-span-2">
         <BaseInput 
           v-model="form.registration_card_number"
-          label="Registed Card Number"
+          label="Registered Card Number"
           placeholder="1HGBVNXXMAS1098296"
           required
           :error="getError(errors, 'registration_card_number')"
@@ -205,8 +226,8 @@ onMounted(() => {
             />
           </div>
 
-          <span v-if="getError(errors, 'images')" class="text-xs text-red-500">
-            {{ getError(errors, 'images') }}
+          <span v-if="getError(errors, 'images') || errorMessage" class="text-xs text-red-500">
+            {{ getError(errors, 'images') ?? errorMessage }}
           </span>
         </div>
 

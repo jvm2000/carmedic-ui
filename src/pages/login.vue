@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, onMounted, ref, watchEffect } from 'vue';
+import BaseToast from '../components/BaseToast.vue';
 import BaseButton from '../components/BaseButton.vue';
 import BaseInput from '../components/BaseInput.vue';
 import BaseCombobox from '../components/BaseCombobox.vue';
@@ -15,13 +16,6 @@ type LoginForm = {
   password: string,
 }
 
-type AddressForm = {
-  state: string,
-  city: string,
-  postal_code: string,
-  street_adress: string,
-}
-
 const router = useRouter()
 const type = ref('login')
 const form = ref<SignUpForm>({
@@ -29,15 +23,13 @@ const form = ref<SignUpForm>({
   full_name: '',
   phone_number: '',
   whatsapp_number: '',
-  address: '',
-  password: '',
-  password_confirmation: ''
-})
-const addressForm = ref<AddressForm>({
   state: '',
   city: '',
   postal_code: '',
-  street_adress: ''
+  street_adress: '',
+  address: '',
+  password: '',
+  password_confirmation: ''
 })
 const loginForm = ref<LoginForm>({
   email: '',
@@ -47,6 +39,9 @@ const errors = ref<any>(null)
 const loading = ref(false)
 const { token } = useAuth()
 const { currentStep, doneLoggedStep, setTitle } = useForm()
+const typeError = ref('register')
+const states = ref<any>([])
+const toast = ref<InstanceType<typeof BaseToast> | null>(null)
 
 async function register() {
   loading.value = true
@@ -58,6 +53,8 @@ async function register() {
 
     type.value = 'login'
     clearForm()
+
+    toast.value?.showToast("Account Registered Successfully")
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -66,6 +63,7 @@ async function register() {
 }
 
 async function login() {
+  typeError.value = 'register'
   loading.value = true
   errors.value = null
 
@@ -77,7 +75,15 @@ async function login() {
     await checkSteps()
     router.push('/dashboard')
   } catch (error: any) {
-    errors.value = error.response.errors
+    if (error.response.errors) {
+      errors.value = error.response.errors
+    }
+
+    if (!error.response.errors) {
+      typeError.value = 'login'
+
+      errors.value = { message: [error.response.message] }
+    }
   } finally {
     loading.value = false
   }
@@ -96,29 +102,34 @@ function clearForm() {
     full_name: '',
     phone_number: '',
     whatsapp_number: '',
+    state: '',
+    city: '',
+    postal_code: '',
+    street_adress: '',
     address: '',
     password: '',
     password_confirmation: ''
   }
 
-  addressForm.value = {
-    state: '',
-    city: '',
-    postal_code: '',
-    street_adress: ''
-  }
-
   errors.value = null
 }
 
+async function getStates() {
+  const response = await dbHelper.get('/states')
+
+  states.value = response
+}
+
 const fullAddress = computed(() => {
-  return `${addressForm.value.street_adress} ${addressForm.value.city}, ${addressForm.value.state}, ${addressForm.value.postal_code}`
+  return `${form.value.street_adress} ${form.value.city}, ${form.value.state}, ${form.value.postal_code}`
 })
 
 const titleComputed = computed(() => {
   if (type.value === 'login') return 'Login'
   if (type.value === 'signup') return 'Signup'
 })
+
+onMounted(() => getStates())
 
 watchEffect(() => {
   setTitle(`${titleComputed.value}`)
@@ -165,7 +176,7 @@ watchEffect(() => {
             type="password"
             label="Password"
             placeholder="**********"
-            :error="getError(errors, 'password')"
+            :error="typeError === 'login' ? getError(errors, 'message') : getError(errors, 'password')"
             required
           />
         </div>
@@ -205,7 +216,8 @@ watchEffect(() => {
           />
 
           <BaseCombobox 
-            v-model="addressForm.state"
+            v-model="form.state"
+            :options="states"
             label="State"
             required
             :error="getError(errors, 'state')"
@@ -213,7 +225,7 @@ watchEffect(() => {
 
           <div class="flex flex-col sm:flex-row sm:items-center gap-4">
             <BaseInput
-              v-model="addressForm.city"
+              v-model="form.city"
               label="City"
               placeholder="City"
               required
@@ -221,7 +233,7 @@ watchEffect(() => {
             />
 
             <BaseInput
-              v-model="addressForm.postal_code"
+              v-model="form.postal_code"
               label="Postal Code"
               placeholder="Postal Code"
               required
@@ -230,7 +242,7 @@ watchEffect(() => {
           </div>
 
           <BaseInput
-            v-model="addressForm.street_adress"
+            v-model="form.street_adress"
             label="Address"
             placeholder="123, Jalan Example"
             required
@@ -263,6 +275,8 @@ watchEffect(() => {
       </div>
     </div>
   </div>
+  
+  <BaseToast ref="toast" />
 </template>
 
 <style scoped>

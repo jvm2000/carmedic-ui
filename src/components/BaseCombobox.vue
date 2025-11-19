@@ -1,54 +1,49 @@
-
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue'
-import { Combobox, ComboboxInput, ComboboxButton, ComboboxOptions, ComboboxOption, TransitionRoot } from '@headlessui/vue'
-import { ChevronUpDownIcon } from '@heroicons/vue/20/solid'
+import { ref, computed, watch, onMounted } from 'vue'
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxButton,
+  ComboboxOptions,
+  ComboboxOption,
+  TransitionRoot
+} from '@headlessui/vue'
+import { ChevronUpDownIcon } from '@heroicons/vue/24/outline'
 
 type ComboboxProps = {
-  /**
-   * The placeholder for the combobox.
-   */
-  placeholder?: string,
-
-  /**
-   * The label for the combobox
-   */
-  label?: string,
-
-  /**
-   * An error message or messages value indicating whether the combobox is in an error state.
-   */
+  options: any[]
+  placeholder?: string
+  label?: string
   error?: string | string[] | null
-
-  /**
-   * If the combobox is required
-   */
-  required?: boolean,
+  required?: boolean
 }
 
 const model = defineModel<any>({ required: false })
 const props = withDefaults(
-  defineProps < {
-    placeholder?: ComboboxProps['placeholder'],
-    label?: ComboboxProps['label'],
-    error?: ComboboxProps['error'],
-    required?: ComboboxProps['required'],
+  defineProps<{
+    options: ComboboxProps['options']
+    placeholder?: string
+    label?: string
+    error?: ComboboxProps['error']
+    required?: ComboboxProps['required']
   }>(),
   {
-    placeholder: 'Seletc a state',
+    options: () => [],
+    placeholder: 'Select a state',
     label: '',
     error: '',
     required: false
   }
 )
 
-const states = ref<any>([])
 const query = ref('')
 const errorMessage = ref<string[] | string | null>('')
 
+const internalOptions = ref<any[]>([])
+
 watch(
   () => props.error,
-  (value) => {
+  value => {
     errorMessage.value = value
   }
 )
@@ -59,8 +54,8 @@ function handleCombobox() {
 
 const filteredOptions = computed(() =>
   query.value === ''
-    ? states.value
-    : states.value.filter((option: any) =>
+    ? internalOptions.value
+    : internalOptions.value.filter(option =>
         option
           .toLowerCase()
           .replace(/\s+/g, '')
@@ -68,43 +63,54 @@ const filteredOptions = computed(() =>
       )
 )
 
-async function getStates() {
-  const response = await fetch("https://abledonline.com/carmedicdirectory/api/public/api/states")
+function handleEnterKey() {
+  const text = query.value.trim()
+  if (!text) return
 
-  const data = await response.json()
+  const exists = internalOptions.value.includes(text)
 
-  states.value = data
+  if (!exists) {
+    internalOptions.value.push(text) // add custom item
+  }
+
+  model.value = text
 }
 
-onMounted(() => getStates())
+watch(
+  () => props.options,
+  (newOptions) => {
+    internalOptions.value = [...newOptions]
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <div class="flex flex-col space-y-2 w-full">
-    <label class="text-base font-medium text-black">{{ props.label }} <span v-if="props.required" class="text-red-500">*</span></label>
+    <label class="text-base font-medium text-black">
+      {{ props.label }}
+      <span v-if="props.required" class="text-red-500">*</span>
+    </label>
 
-    <Combobox v-model="model">
+    <Combobox v-model="model" @update:model-value="handleCombobox">
       <div class="relative mt-1">
-        <div
-          class="relative w-full overflow-hidden"
-        >
+        <div class="relative w-full overflow-hidden">
           <ComboboxInput
             class="text-base ring-0 focus:ring-0 outline-none px-4 py-2 border border-gray-300 rounded-md w-full bg-gray-50"
             :class="[errorMessage ? 'border-red-500 placeholder-red-500' : '']"
-            :displayValue="(option: any) =>  option"
+            :displayValue="(val: any) => val"
             :placeholder="props.placeholder"
-            @change="query = $event.target.value"
-            @input="handleCombobox"
+            @input="query = $event.target.value; handleCombobox()"
+            @keydown.enter.prevent="handleEnterKey"
           />
+
           <ComboboxButton
             class="absolute inset-y-0 right-0 flex items-center pr-2"
           >
-            <ChevronUpDownIcon
-              class="h-5 w-5 text-gray-400"
-              aria-hidden="true"
-            />
+            <ChevronUpDownIcon class="h-5 w-5 text-gray-400" />
           </ComboboxButton>
         </div>
+
         <TransitionRoot
           leave="transition ease-in duration-100"
           leaveFrom="opacity-100"
@@ -118,21 +124,21 @@ onMounted(() => getStates())
               v-if="filteredOptions.length === 0 && query !== ''"
               class="relative cursor-default select-none px-4 py-2 text-gray-700 text-base"
             >
-              Nothing found.
+              Nothing found. Press Enter to add <span class="font-semibold">"{{ query }}"</span>
             </div>
 
             <ComboboxOption
               v-for="option in filteredOptions"
-              as="template"
               :key="option"
               :value="option"
               v-slot="{ selected, active }"
+              as="template"
             >
               <li
                 class="relative cursor-default select-none py-3 px-6"
                 :class="{
-                  'bg-red-400 text-black': active,
-                  'text-gray-900': !active,
+                  'bg-gray-200 text-black': active,
+                  'text-gray-900': !active
                 }"
               >
                 <span
@@ -150,4 +156,4 @@ onMounted(() => getStates())
 
     <p v-if="errorMessage" class="text-xs text-red-500">{{ errorMessage }}</p>
   </div>
-</template> 
+</template>

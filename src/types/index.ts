@@ -25,12 +25,24 @@ export type Appointment = {
   status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';
 }
 
-export type SignUpForm = {
+export type UserForm = {
   email: string;
   full_name: string;
   phone_number: string;
   whatsapp_number: string;
   address: string;
+}
+
+export type SignUpForm = {
+  email: string;
+  full_name: string;
+  phone_number: string;
+  whatsapp_number: string;
+  state: string,
+  city: string,
+  postal_code: string,
+  street_adress: string
+  address?: string;
   password?: string;
   password_confirmation?: string;
 };

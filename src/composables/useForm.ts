@@ -8,6 +8,10 @@ const signupForm = ref<SignUpForm>({
   full_name: '',
   phone_number: '',
   whatsapp_number: '',
+  state: '',
+  city: '',
+  postal_code: '',
+  street_adress: '',
   address: '',
 })
 const vehicleForm = ref<VehicleForm>({

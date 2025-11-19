@@ -6,28 +6,53 @@ import { useAuth } from '../../composables/useAuth';
 import { dbHelper } from '../../helpers/dbHelper';
 import BaseInput from '../BaseInput.vue';
 import { useForm } from '../../composables/useForm';
-import type { User } from '../../types';
+import type { User, UserForm } from '../../types';
 
 const isDisabled = ref(false)
 const user = ref<User | null>(null)
 const { token } = useAuth()
-const { nextStep, signupForm: form } = useForm()
+const loading = ref(false)
+const errors = ref<any>(null)
+const { nextStep } = useForm()
+const userForm = ref<UserForm>({
+  email: '',
+  full_name: '',
+  phone_number: '',
+  whatsapp_number: '',
+  address: ''
+})
 
 async function fetchUserData() {
   const response = await dbHelper.get('/get', token.value ?? '')
 
   user.value = response
 
-  await initializeForm()
+  initializeForm()
+}
+
+async function updateUser() {
+  loading.value = true
+
+  try {
+    await dbHelper.put('/user/update', userForm.value, token.value ?? '');
+
+    isDisabled.value = false
+
+    fetchUserData()
+  } catch (error: any) {
+    errors.value = error.response.errors
+  } finally {
+    loading.value = false
+  }
 }
 
 function initializeForm() {
   if (user.value) {
-    form.value.full_name = user.value.full_name || ''
-    form.value.email = user.value.email || ''
-    form.value.phone_number = user.value.phone_number || ''
-    form.value.whatsapp_number = user.value.whatsapp_number || ''
-    form.value.address = user.value.address || ''
+    userForm.value.full_name = user.value.full_name || ''
+    userForm.value.email = user.value.email || ''
+    userForm.value.phone_number = user.value.phone_number || ''
+    userForm.value.whatsapp_number = user.value.whatsapp_number || ''
+    userForm.value.address = user.value.address || ''
   }
 
   return
@@ -62,7 +87,7 @@ onBeforeMount(() => {
     </div>
 
     <BaseInput
-      v-model="form.full_name"
+      v-model="userForm.full_name"
       label="Full Name"
       placeholder="John Doe"
       required
@@ -74,7 +99,7 @@ onBeforeMount(() => {
     </BaseInput>
 
     <BaseInput
-      v-model="form.email"
+      v-model="userForm.email"
       label="Email Address"
       placeholder="Enter your email address"
       required
@@ -86,7 +111,7 @@ onBeforeMount(() => {
     </BaseInput>
 
     <BaseInput
-      v-model="form.phone_number"
+      v-model="userForm.phone_number"
       label="Phone"
       placeholder="+60 000 000 000"
       required
@@ -98,7 +123,7 @@ onBeforeMount(() => {
     </BaseInput>
 
     <BaseInput
-      v-model="form.whatsapp_number"
+      v-model="userForm.whatsapp_number"
       label="Whatsapp Number"
       placeholder="+60 000 000 000"
       required
@@ -110,7 +135,7 @@ onBeforeMount(() => {
     </BaseInput>
 
     <BaseInput
-      v-model="form.address"
+      v-model="userForm.address"
       label="Full Address"
       placeholder="123, Jalan Example, 45678 City, Country"
       required
@@ -121,7 +146,11 @@ onBeforeMount(() => {
       </template>
     </BaseInput>
 
-    <BaseButton v-if="isDisabled">Update</BaseButton>
+    <BaseButton 
+      v-if="isDisabled"
+      :loading="loading"
+      @click="updateUser"
+    >Update</BaseButton>
 
     <BaseButton 
       v-if="!isDisabled"
