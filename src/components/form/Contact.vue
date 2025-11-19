@@ -7,6 +7,7 @@ import { dbHelper } from '../../helpers/dbHelper';
 import BaseInput from '../BaseInput.vue';
 import { useForm } from '../../composables/useForm';
 import type { User, UserForm } from '../../types';
+import BaseToast from '../../components/BaseToast.vue';
 
 const isDisabled = ref(false)
 const user = ref<User | null>(null)
@@ -21,6 +22,7 @@ const userForm = ref<UserForm>({
   whatsapp_number: '',
   address: ''
 })
+const toast = ref<InstanceType<typeof BaseToast> | null>(null)
 
 async function fetchUserData() {
   const response = await dbHelper.get('/get', token.value ?? '')
@@ -38,6 +40,7 @@ async function updateUser() {
 
     isDisabled.value = false
 
+    toast.value?.showToast("Contacts Updated Successfully")
     fetchUserData()
   } catch (error: any) {
     errors.value = error.response.errors
@@ -157,4 +160,6 @@ onBeforeMount(() => {
       @click="nextStep()"
     >Continue to vehicle details</BaseButton>
   </div>
+
+  <BaseToast ref="toast" />
 </template>

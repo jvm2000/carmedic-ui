@@ -137,7 +137,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="w-full grid place-items-center web overflow-x-hidden">
+  <div 
+    class="w-full grid place-items-center web overflow-x-hidden"
+    :class="[type === 'signup' ? 'py-8' : '']"
+  >
     <div class="flex flex-col items-center space-y-8 w-full">
       <img src="/images/logo.png" alt="" class="h-16">
 
