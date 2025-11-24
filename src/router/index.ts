@@ -20,7 +20,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory('/carmedicdirectory/'),
+  history: createWebHistory('/carmedic/'),
   routes
 })
 

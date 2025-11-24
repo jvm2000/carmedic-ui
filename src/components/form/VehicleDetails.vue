@@ -152,8 +152,8 @@ onMounted(() => {
         <BaseCombobox 
           v-model="form.make"
           :options="makes"
-          label="Make"
-          placeholder="Select a Make"
+          label="Brand"
+          placeholder="Select a Brand"
           required
           :error="getError(errors, 'make')"
         />
