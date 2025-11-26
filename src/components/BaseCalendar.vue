@@ -62,7 +62,17 @@ function isSelected(day: any) {
   )
 }
 
+const today = new Date()
+today.setHours(0, 0, 0, 0)
+
+function isPastDate(date: Date) {
+  const d = new Date(date)
+  d.setHours(0, 0, 0, 0)
+  return d < today
+}
+
 function selectDate(day: any) {
+  if (isPastDate(day.date)) return
   selectedDate.value = new Date(day.date)
   currentDate.value = new Date(day.date)
   modelValue.value = selectedDate.value
@@ -82,7 +92,6 @@ function prevMonth() {
 
 async function handleOpen() {
   if (modelValue.value) {
-    // If modelValue is a string like "2025-11-03", parse it safely
     const parsedDate = new Date(modelValue.value + 'T00:00:00')
     if (!isNaN(parsedDate.getTime())) {
       selectedDate.value = parsedDate
@@ -133,12 +142,14 @@ onBeforeMount(async () => {
         <div
           v-for="(day, index) in calendarDays"
           :key="index"
-          @click="selectDate(day)"
-          class="aspect-square flex items-center justify-center cursor-pointer transition-all"
-          :class="[ 
+          @click="!isPastDate(day.date) && selectDate(day)"
+          class="aspect-square flex items-center justify-center transition-all"
+          :class="[
             isSelected(day) ? 'bg-red-500 text-white rounded-lg' : '',
             !day.isCurrentMonth ? 'text-gray-400' : '',
-            !isSelected(day) ? 'hover:bg-red-300 hover:rounded-lg' : ''
+            isPastDate(day.date)
+              ? 'text-gray-300 cursor-not-allowed'
+              : 'cursor-pointer hover:bg-red-300 hover:rounded-lg'
           ]"
         >
           {{ day.date.getDate() }}
