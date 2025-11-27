@@ -21,6 +21,16 @@ type InputProps = {
   required?: boolean
 
   /**
+   * If the input is uppercase.
+   */
+  uppercase?: boolean
+
+  /**
+   * If the input is formatted.
+   */
+  formatted?: boolean
+
+  /**
    * The type for the input.
    */
   type?: string
@@ -43,12 +53,16 @@ const props = withDefaults(
     label?: InputProps['label'],
     type?: InputProps['type'],
     required?: InputProps['required'],
+    uppercase?: InputProps['uppercase'],
+    formatted?: InputProps['formatted'],
     error?: InputProps['error'],
     disabled?: InputProps['disabled'],
   }>(),
   {
     type: 'text',
     required: false,
+    uppercase: false,
+    formatted: false,
     error: '',
     info: '',
     disabled: false,
@@ -65,8 +79,28 @@ watch(
   }
 )
 
-function handleInput() {
+function handleInput(e: Event) {
   errorMessage.value = ''
+
+  const target = e.target as HTMLInputElement
+
+  if (props.uppercase) {
+    model.value = target.value.toUpperCase()
+  }
+
+  if (props.formatted) {
+    let value = target.value.toUpperCase()
+
+    value = value.replace(/-/g, '')
+
+    value = value.slice(0, 6)
+
+    if (value.length > 3) {
+      value = value.slice(0, 3) + '-' + value.slice(3)
+    }
+
+    model.value = value
+  }
 }
 </script>
 
