@@ -44,6 +44,7 @@ const states = ref<any>([])
 const toast = ref<InstanceType<typeof BaseToast> | null>(null)
 
 async function register() {
+  errors.value = null
   loading.value = true
 
   form.value.address = fullAddress.value
@@ -56,7 +57,7 @@ async function register() {
 
     toast.value?.showToast("Account Registered Successfully")
   } catch (error: any) {
-    errors.value = error.response.errors
+    errors.value = error.response?.errors
   } finally {
     loading.value = false
   }
@@ -75,14 +76,14 @@ async function login() {
     await checkSteps()
     router.push('/dashboard')
   } catch (error: any) {
-    if (error.response.errors) {
-      errors.value = error.response.errors
+    if (error.response?.errors) {
+      errors.value = error.response?.errors
     }
 
-    if (!error.response.errors) {
+    if (!error.response?.errors) {
       typeError.value = 'login'
 
-      errors.value = { message: [error.response.message] }
+      errors.value = { message: [error.response?.message] }
     }
   } finally {
     loading.value = false
@@ -120,19 +121,24 @@ async function getStates() {
   states.value = response
 }
 
+function submitForm() {
+  if (type.value === 'login') {
+    login()
+
+    return
+  }
+
+  register()
+}
+
 const fullAddress = computed(() => {
   return `${form.value.street_adress} ${form.value.city}, ${form.value.state}, ${form.value.postal_code}`
-})
-
-const titleComputed = computed(() => {
-  if (type.value === 'login') return 'Login'
-  if (type.value === 'signup') return 'Signup'
 })
 
 onMounted(() => getStates())
 
 watchEffect(() => {
-  setTitle(`${titleComputed.value}`)
+  setTitle('Login/Register')
 })
 </script>
 
@@ -164,117 +170,120 @@ watchEffect(() => {
           >Signup</button>
         </div>
 
-        <div v-if="type === 'login'" class="space-y-6 w-full">
-          <BaseInput 
-            v-model="loginForm.email"
-            type="Email"
-            label="Email"
-            placeholder="your@email.com"
-            :error="getError(errors, 'email')"
-            required
-          />
-
-          <BaseInput 
-            v-model="loginForm.password"
-            type="password"
-            label="Password"
-            placeholder="**********"
-            :error="typeError === 'login' ? getError(errors, 'message') : getError(errors, 'password')"
-            required
-          />
-        </div>
-
-        <div v-if="type === 'signup'" class="space-y-6 w-full">
-          <BaseInput 
-            v-model="form.email"
-            type="email"
-            label="Email"
-            placeholder="your@email.com"
-            :error="getError(errors, 'email')"
-            required
-          />
-
-          <BaseInput 
-            v-model="form.full_name"
-            label="Full Name"
-            placeholder="John Doe"
-            :error="getError(errors, 'full_name')"
-            required
-          />
-
-          <BaseInput 
-            v-model="form.phone_number"
-            label="Phone Number"
-            placeholder="+60 000 000 000"
-            :error="getError(errors, 'phone_number')"
-            required
-          />
-
-          <BaseInput 
-            v-model="form.whatsapp_number"
-            label="Whatsapp Number"
-            placeholder="+60 000 000 000"
-            :error="getError(errors, 'whatsapp_number')"
-            required
-          />
-
-          <BaseCombobox 
-            v-model="form.state"
-            :options="states"
-            label="State"
-            required
-            :error="getError(errors, 'state')"
-          />
-
-          <div class="flex flex-col sm:flex-row sm:items-center gap-4">
-            <BaseInput
-              v-model="form.city"
-              label="City"
-              placeholder="City"
+        <form method="POST" @submit.prevent="submitForm" class="flex flex-col items-center space-y-8 w-full">
+          <div v-if="type === 'login'" class="space-y-6 w-full">
+            <BaseInput 
+              v-model="loginForm.email"
+              type="Email"
+              label="Email"
+              placeholder="your@email.com"
+              :error="getError(errors, 'email')"
               required
-              :error="getError(errors, 'city')"
             />
 
-            <BaseInput
-              v-model="form.postal_code"
-              label="Postal Code"
-              placeholder="Postal Code"
+            <BaseInput 
+              v-model="loginForm.password"
+              type="password"
+              label="Password"
+              placeholder="**********"
+              :error="typeError === 'login' ? getError(errors, 'message') : getError(errors, 'password')"
               required
-              :error="getError(errors, 'postal_code')"
             />
           </div>
 
-          <BaseInput
-            v-model="form.street_adress"
-            label="Address"
-            placeholder="123, Jalan Example"
-            required
-            :error="getError(errors, 'street_adress')"
-          />
+          <div v-if="type === 'signup'" class="space-y-6 w-full">
+            <BaseInput 
+              v-model="form.email"
+              type="email"
+              label="Email"
+              placeholder="your@email.com"
+              :error="getError(errors, 'email')"
+              required
+            />
 
-          <BaseInput 
-            v-model="form.password"
-            type="password"
-            label="Password"
-            placeholder="**********"
-            :error="getError(errors, 'password')"
-            required
-          />
+            <BaseInput 
+              v-model="form.full_name"
+              label="Full Name"
+              placeholder="John Doe"
+              :error="getError(errors, 'full_name')"
+              required
+            />
 
-          <BaseInput 
-            v-model="form.password_confirmation"
-            type="password"
-            label="Confirm Password"
-            placeholder="**********"
-            :error="getError(errors, 'password')"
-            required
-          />
-        </div>
+            <BaseInput 
+              v-model="form.phone_number"
+              label="Phone Number"
+              placeholder="+60 000 000 000"
+              :error="getError(errors, 'phone_number')"
+              required
+            />
 
-        <BaseButton
-          :loading
-          @click="type === 'login' ? login() : register()">
-        {{ type === 'login' ? 'Login' : 'Signup' }}</BaseButton>
+            <BaseInput 
+              v-model="form.whatsapp_number"
+              label="Whatsapp Number"
+              placeholder="+60 000 000 000"
+              :error="getError(errors, 'whatsapp_number')"
+              required
+            />
+
+            <BaseCombobox 
+              v-model="form.state"
+              :options="states"
+              label="State"
+              required
+              :error="getError(errors, 'state')"
+            />
+
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+              <BaseInput
+                v-model="form.city"
+                label="City"
+                placeholder="City"
+                required
+                :error="getError(errors, 'city')"
+              />
+
+              <BaseInput
+                v-model="form.postal_code"
+                label="Postal Code"
+                placeholder="Postal Code"
+                required
+                :error="getError(errors, 'postal_code')"
+              />
+            </div>
+
+            <BaseInput
+              v-model="form.street_adress"
+              label="Address"
+              placeholder="123, Jalan Example"
+              required
+              :error="getError(errors, 'street_adress')"
+            />
+
+            <BaseInput 
+              v-model="form.password"
+              type="password"
+              label="Password"
+              placeholder="**********"
+              :error="getError(errors, 'password')"
+              required
+            />
+
+            <BaseInput 
+              v-model="form.password_confirmation"
+              type="password"
+              label="Confirm Password"
+              placeholder="**********"
+              :error="getError(errors, 'password')"
+              required
+            />
+          </div>
+
+          <BaseButton
+            :loading
+            isSubmitting
+            @click="type === 'login' ? login() : register()">
+          {{ type === 'login' ? 'Login' : 'Signup' }}</BaseButton>
+        </form>
       </div>
     </div>
   </div>

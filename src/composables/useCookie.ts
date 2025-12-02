@@ -1,34 +1,25 @@
 import { ref, watch } from 'vue'
 
-export function useCookie(name: string, defaultValue: string | null = null) {
-  const getCookie = (key: string): string | null => {
+export function useCookie<T = string>(name: string, defaultValue: T | null = null) {
+  const getCookie = (key: string): T => {
     const value = document.cookie
       .split('; ')
       .find(row => row.startsWith(key + '='))
       ?.split('=')[1]
-    return value ? decodeURIComponent(value) : null
-  }
 
-  const setCookie = (key: string, value: string, days = 7) => {
-    const expires = new Date(Date.now() + days * 864e5).toUTCString()
-    document.cookie = `${key}=${encodeURIComponent(value)}; expires=${expires}; path=/`
-  }
-
-  const deleteCookie = (key: string) => {
-    document.cookie = `${key}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-  }
-
-  // make it reactive
-  const cookie = ref<string | null>(getCookie(name) || defaultValue)
-
-  // update cookie when value changes
-  watch(cookie, (newVal) => {
-    if (newVal === null) {
-      deleteCookie(name)
-    } else {
-      setCookie(name, newVal)
+    if (value === undefined) return defaultValue ?? null as unknown as T
+    try {
+      return JSON.parse(decodeURIComponent(value)) as T
+    } catch {
+      return value as unknown as T
     }
-  })
+  }
+
+  const cookie = ref<T>(getCookie(name))
+
+  watch(cookie, (newValue) => {
+    document.cookie = `${name}=${encodeURIComponent(JSON.stringify(newValue))}; path=/`
+  }, { deep: true })
 
   return cookie
 }

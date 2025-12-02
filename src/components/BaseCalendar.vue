@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { ChevronUpIcon, ChevronDownIcon } from '@heroicons/vue/24/outline'
-import { computed, onBeforeMount, ref } from 'vue';
+import { computed, onBeforeMount, ref } from 'vue'
+
+const props = defineProps<{
+  disabled?: boolean
+}>()
 
 const selectedDate = ref<Date | null>(null)
 const currentDate = ref(new Date())
@@ -72,19 +76,23 @@ function isPastDate(date: Date) {
 }
 
 function selectDate(day: any) {
+  if (props.disabled) return
   if (isPastDate(day.date)) return
+
   selectedDate.value = new Date(day.date)
   currentDate.value = new Date(day.date)
   modelValue.value = selectedDate.value
 }
 
 function nextMonth() {
+  if (props.disabled) return
   const next = new Date(currentDate.value)
   next.setMonth(currentDate.value.getMonth() + 1)
   currentDate.value = next
 }
 
 function prevMonth() {
+  if (props.disabled) return
   const prev = new Date(currentDate.value)
   prev.setMonth(currentDate.value.getMonth() - 1)
   currentDate.value = prev
@@ -117,19 +125,25 @@ onBeforeMount(async () => {
       <span class="text-red-500">* </span>
     </label>
 
-    <div class="w-full select-none">
+    <div class="w-full select-none" :class="props.disabled ? 'opacity-50' : ''">
       <div class="flex justify-between items-center mb-8">
         <h2 class="text-sm font-semibold text-custom-brown-500 uppercase tracking-wide">
           {{ monthNames[currentMonth] }} {{ currentYear }}
         </h2>
 
         <div class="flex gap-2">
-          <button @click="prevMonth">
-            <ChevronUpIcon class="w-6 h-6 stroke-custom-brown-500" />
+          <button @click="prevMonth" :disabled="props.disabled">
+            <ChevronUpIcon
+              class="w-6 h-6"
+              :class="props.disabled ? 'stroke-gray-300' : 'stroke-custom-brown-500'"
+            />
           </button>
 
-          <button @click="nextMonth">
-            <ChevronDownIcon class="w-6 h-6 stroke-custom-brown-500" />
+          <button @click="nextMonth" :disabled="props.disabled">
+            <ChevronDownIcon
+              class="w-6 h-6"
+              :class="props.disabled ? 'stroke-gray-300' : 'stroke-custom-brown-500'"
+            />
           </button>
         </div>
       </div>
@@ -142,14 +156,16 @@ onBeforeMount(async () => {
         <div
           v-for="(day, index) in calendarDays"
           :key="index"
-          @click="!isPastDate(day.date) && selectDate(day)"
+          @click="!props.disabled && !isPastDate(day.date) && selectDate(day)"
           class="aspect-square flex items-center justify-center transition-all"
           :class="[
             isSelected(day) ? 'bg-red-500 text-white rounded-lg' : '',
             !day.isCurrentMonth ? 'text-gray-400' : '',
-            isPastDate(day.date)
+            props.disabled
               ? 'text-gray-300 cursor-not-allowed'
-              : 'cursor-pointer hover:bg-red-300 hover:rounded-lg'
+              : isPastDate(day.date)
+                ? 'text-gray-300 cursor-not-allowed'
+                : 'cursor-pointer hover:bg-red-300 hover:rounded-lg'
           ]"
         >
           {{ day.date.getDate() }}

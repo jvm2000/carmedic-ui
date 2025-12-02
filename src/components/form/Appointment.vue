@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import BaseCalendar from '../BaseCalendar.vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import BaseTextArea from '../BaseTextArea.vue';
 import { useForm } from '../../composables/useForm';
 import BaseButton from '../BaseButton.vue';
@@ -32,6 +32,7 @@ const loading = ref(false)
 const errors = ref<any>(null)
 const { token } = useAuth()
 const { vehicle } = useVehicle()
+const isDisabled = ref(false)
 
 function selectTime(time: TimeSlot) {
   selectedTime.value = time.value ?? ''
@@ -98,6 +99,12 @@ function initializeForm() {
   return
 }
 
+const cannotEdit = computed(() => {
+  if (vehicle.value && !isDisabled.value) return true
+
+  return false
+})
+
 onMounted(() => {
   fetchAppointment()
 })
@@ -114,33 +121,45 @@ onMounted(() => {
 
         <p class="text-base text-black">Choose a convenient date and time for doorstep deregistration</p>
       </div>
+
+      <button v-if="appointment && !isDisabled" class="flex items-center space-x-2" @click="isDisabled = true">
+        <PencilIcon class="size-4 stroke-gray-800" />
+        
+        <span class="text-base">Edit</span>
+      </button>
+
+      <button v-if="appointment && isDisabled" class="flex items-center" @click="isDisabled = false">
+        <span class="text-base">Cancel</span>
+      </button>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-x-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-10">
       <BaseCalendar
         v-model="form.scheduled_date"
+        :disabled="cannotEdit"
       />
-    </div>
 
-    <div class="flex flex-col space-y-2 w-full">
-      <label class="text-base font-medium text-black">
-        Select Time
-        <span class="text-red-500">* </span>
-      </label>
+      <div class="flex flex-col space-y-2 w-full">
+        <label class="text-base font-medium text-black">
+          Select Time
+          <span class="text-red-500">* </span>
+        </label>
 
-      <div class="flex flex-wrap gap-2">
-        <button 
-          v-for="time in timeSlots"
-          :class="[
-            'w-24 sm:w-48 justify-center py-2 text-sm sm:text-base rounded-md border transition-colors',
-            selectedTime === time.value
-              ? 'bg-red-500 text-white border-red-600'
-              : 'bg-gray-50 text-black border-gray-300 hover:bg-gray-100'
-          ]"
-          @click="selectTime(time)"
-        >
-          {{ time.label }}
-        </button>
+        <div class="flex flex-wrap gap-2">
+          <button 
+            v-for="time in timeSlots"
+            :class="[
+              'w-12 sm:w-24 justify-center py-2 text-sm rounded-md border transition-colors disabled:opacity-75',
+              selectedTime === time.value
+                ? 'bg-red-500 text-white border-red-600'
+                : 'bg-gray-50 text-black border-gray-300 hover:bg-gray-100'
+            ]"
+            :disabled="cannotEdit"
+            @click="selectTime(time)"
+          >
+            {{ time.label }}
+          </button>
+        </div>
       </div>
     </div>
 
@@ -149,6 +168,7 @@ onMounted(() => {
       label="Additional Notes"
       placeholder="Please kindly a note here if possible."
       required
+      :disabled="cannotEdit"
     />
 
     <div class="grid grid-cols-2 gap-6 w-full">

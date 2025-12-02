@@ -16,6 +16,11 @@ type ButtonProps = {
    * If the button is loading.
    */
   loading?: boolean,
+
+  /**
+   * If the button is submitting type.
+   */
+  isSubmitting?: boolean,
 }
 
 const props = withDefaults(
@@ -23,11 +28,13 @@ const props = withDefaults(
     type?: ButtonProps['type'],
     disabled?: ButtonProps['disabled'],
     loading?: ButtonProps['loading'],
+    isSubmitting?: ButtonProps['isSubmitting'],
   }>(),
   {
     type: 'primary',
     disabled: false,
-    loaading: false
+    loaading: false,
+    isSubmitting: false
   }
 )
 </script>
@@ -35,7 +42,7 @@ const props = withDefaults(
 <template>
   <button 
     v-bind="$attrs"
-    type="submit"
+    :type="props.isSubmitting ? 'submit' : 'button'"
     class="flex items-center px-4 py-2.5 text-base rounded-md ring-1 ring-red-600 font-medium hover:opacity-90 justify-center w-full disabled:opacity-75"
     :class="[
       props.type === 'primary'

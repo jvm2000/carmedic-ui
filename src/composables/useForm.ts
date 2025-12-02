@@ -1,8 +1,10 @@
 import { computed, ref } from "vue";
 import type { AppointmentForm, SignUpForm, VehicleForm } from '../types';
+import { useCookie } from "./useCookie";
 
-const currentStep = ref(0)
-const doneLoggedStep = ref(0)
+const currentStep = useCookie('current-step', 0)
+const doneLoggedStep = useCookie('done-logged-step', 0)
+
 const signupForm = ref<SignUpForm>({
   email: '',
   full_name: '',

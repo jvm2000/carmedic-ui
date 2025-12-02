@@ -122,7 +122,7 @@ function handleInput(e: Event) {
       <input 
         v-model="model"
         :type="props.type === 'password' && !isPlainText ? 'text' : props.type"
-        class="text-base px-4 py-2 ring-1 rounded-md w-full bg-gray-50 ring-red-50 focus:ring-blue-300 disabled:opacity-75"
+        class="text-base px-4 py-2 ring-1 rounded-md w-full bg-gray-50 ring-red-50 focus:ring-blue-300 disabled:opacity-75 disabled:cursor-not-allowed"
         :class="[
           'rounded-md px-3 py-2', // base styles
           errorMessage

@@ -129,7 +129,7 @@ onMounted(() => { setTitle('Welcome') })
 
           <p class="text-black font-bold text-3xl">Fast & Easy</p>
 
-          <p class="text-xl text-gray-900 text-center">
+          <p class="text-xl text-gray-900 text-left">
             Complete the entire process in just 6 simple steps from the comfort of your home
           </p>
         </div>
@@ -141,7 +141,7 @@ onMounted(() => { setTitle('Welcome') })
 
           <p class="text-black font-bold text-3xl">Free Collection</p>
 
-          <p class="text-xl text-gray-900 text-center">
+          <p class="text-xl text-gray-900 text-left">
             No hidden fees or charges - we come to your doorstep at no extra cost
           </p>
         </div>
@@ -153,7 +153,7 @@ onMounted(() => { setTitle('Welcome') })
 
           <p class="text-black font-bold text-3xl">Instant Payment</p>
 
-          <p class="text-xl text-gray-900 text-center">
+          <p class="text-xl text-gray-900 text-left">
             Receive your compensation immediately upon vehicle collection
           </p>
         </div>

@@ -15,7 +15,8 @@ type ComboboxProps = {
   placeholder?: string
   label?: string
   error?: string | string[] | null
-  required?: boolean
+  required?: boolean,
+  disabled?: boolean
 }
 
 const model = defineModel<any>({ required: false })
@@ -26,13 +27,15 @@ const props = withDefaults(
     label?: string
     error?: ComboboxProps['error']
     required?: ComboboxProps['required']
+    disabled?: ComboboxProps['disabled']
   }>(),
   {
     options: () => [],
     placeholder: 'Select a state',
     label: '',
     error: '',
-    required: false
+    required: false,
+    disabled: false
   }
 )
 
@@ -92,7 +95,7 @@ watch(
       <span v-if="props.required" class="text-red-500">*</span>
     </label>
 
-    <Combobox v-model="model" @update:model-value="handleCombobox">
+    <Combobox v-model="model" @update:model-value="handleCombobox" :disabled="props.disabled">
       <div class="relative mt-1">
         <div class="relative w-full overflow-hidden">
           <ComboboxInput

@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { TruckIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import { TruckIcon, XMarkIcon, PencilIcon } from '@heroicons/vue/24/outline'
 import BaseInput from '../BaseInput.vue';
-import { ArrowUpTrayIcon } from '@heroicons/vue/24/outline'
+import { ArrowUpTrayIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '../BaseButton.vue';
 import { useForm } from '../../composables/useForm';
 import { useVehicle } from '../../composables/useVehicle';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { getError } from '../../helpers/errorHelper';
@@ -20,6 +20,7 @@ const { currentStep, prevStep, vehicleForm: form } = useForm()
 const errorMessage = ref('')
 const { vehicle } = useVehicle()
 const makes = ref<any>([])
+const isDisabled = ref(false)
 
 async function getMakes() {
   const response = await dbHelper.get('/makes')
@@ -28,6 +29,8 @@ async function getMakes() {
 }
 
 function uploadImage() {
+  if (cannotEdit.value) return
+
   document.getElementById('profile-photo')?.click()
 }
 
@@ -126,7 +129,13 @@ async function submit() {
   } finally {
     loading.value = false
   }
-}
+} 
+
+const cannotEdit = computed(() => {
+  if (vehicle.value && !isDisabled.value) return true
+
+  return false
+})
 
 onMounted(() => {
   getMakes(),
@@ -145,6 +154,16 @@ onMounted(() => {
 
         <p class="text-base text-black">Tell us about your vehicle and upload photos</p>
       </div>
+
+      <button v-if="vehicle && !isDisabled" class="flex items-center space-x-2" @click="isDisabled = true">
+        <PencilIcon class="size-4 stroke-gray-800" />
+        
+        <span class="text-base">Edit</span>
+      </button>
+
+      <button v-if="vehicle && isDisabled" class="flex items-center" @click="isDisabled = false">
+        <span class="text-base">Cancel</span>
+      </button>
     </div>
 
     <div class="grid grid-cols-2 gap-6 w-full">
@@ -155,6 +174,7 @@ onMounted(() => {
           label="Brand"
           placeholder="Select a Brand"
           required
+          :disabled="cannotEdit"
           :error="getError(errors, 'make')"
         />
       </div>
@@ -165,6 +185,7 @@ onMounted(() => {
           label="Model"
           placeholder="Camry"
           required
+          :disabled="cannotEdit"
           :error="getError(errors, 'model')"
         />
       </div>
@@ -175,6 +196,7 @@ onMounted(() => {
           label="Year"
           placeholder="2020"
           required
+          :disabled="cannotEdit"
           :error="getError(errors, 'year')"
         />
       </div>
@@ -185,6 +207,8 @@ onMounted(() => {
           label="License Plate"
           placeholder="ABC-1234"
           required
+          formatted
+          :disabled="cannotEdit"
           :error="getError(errors, 'plate_number')"
         />
       </div>
@@ -195,26 +219,35 @@ onMounted(() => {
           label="Registered Card Number"
           placeholder="1HGBVNXXMAS1098296"
           required
+          uppercase
+          :disabled="cannotEdit"
           :error="getError(errors, 'registration_card_number')"
         />
       </div>
 
       <div class="col-span-2 flex flex-col space-y-2">
         <div class="flex flex-col space-y-2 w-full">
-          <label class="text-base font-medium text-black">
-            Vehicle Photos
-            <span class="text-red-500">* </span>
-            <span>(Max 5)</span>
-          </label>
+          <div>
+            <label class="text-base font-medium text-black">
+              Vehicle Photos
+              <span class="text-red-500">* </span>
+              <span>(Max 5) </span>
+            </label>
+
+             <p class="text-red-500 font-medium">Note: When uploading photos it should be front, rear, left hand, right hand, and engine compartment</p>
+          </div>
 
           <div 
-            class="relative cursor-pointer w-full border-dashed border-2 border-gray-400 rounded-lg grid place-items-center hover:border-red-500 h-36"
+            class="relative w-full border-dashed border-2 border-gray-400 rounded-lg grid place-items-center h-36"
+            :class="[cannotEdit ? 'cursor-not-allowed' : 'cursor-pointer hover:border-red-500 ']"
              @click="uploadImage"
           >
             <div class="flex flex-col items-center space-y-0">
-              <ArrowUpTrayIcon class="size-8 stroke-gray-600" />
-              <span class="text-base text-gray-500">Click to upload or drag and drop</span>
-              <span class="text-sm text-gray-500">PNG, JPG up to  10MB each</span>
+              <ArrowUpTrayIcon v-if="!cannotEdit" class="size-8 stroke-gray-600" />
+              <LockClosedIcon v-if="cannotEdit" class="size-8 stroke-gray-600" />
+
+              <span class="text-base text-gray-500">{{ cannotEdit ? 'Cannot edit' : 'Click to upload or drag and drop<'}}</span>
+              <span v-if="!cannotEdit" class="text-sm text-gray-500">PNG, JPG up to  10MB each</span>
             </div>
 
             <input 
@@ -240,6 +273,7 @@ onMounted(() => {
             <img class="w-full object-cover" :src="src" alt="Vehicle Image Preview" />
 
             <div 
+              v-if="!cannotEdit"
               class="bg-red-500 rounded-full size-6 grid place-items-center absolute top-1 right-1 cursor-pointer"
                @click="removeImage(index)"
             >

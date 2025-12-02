@@ -85,7 +85,7 @@ function handleInput() {
       
       <textarea 
         v-model="model"
-        class="text-base px-4 py-2 ring-1 rounded-md w-full bg-gray-50 ring-red-50 focus:ring-blue-300 disabled:opacity-75 h-24"
+        class="text-base px-4 py-2 ring-1 rounded-md w-full bg-gray-50 ring-red-50 focus:ring-blue-300 disabled:opacity-75 h-24 disabled:cursor-not-allowed"
         :class="[
           'rounded-md px-3 py-2', // base styles
           errorMessage

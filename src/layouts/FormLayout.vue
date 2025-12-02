@@ -7,7 +7,7 @@ import { useForm } from '../composables/useForm';
 import { dbHelper } from '../helpers/dbHelper';
 import { ref, watchEffect } from 'vue';
 
-const { currentStep, setTitle, titleChuck, doneLoggedStep } = useForm()
+const { currentStep, setTitle, titleChuck, doneLoggedStep, vehicleForm, appointmentForm } = useForm()
 const { token } = useAuth()
 const router = useRouter()
 const loading = ref(false)
@@ -17,10 +17,25 @@ async function logout() {
 
   await dbHelper.post('/logout', {}, token.value ?? '');
 
-  token.value = null
+  token.value = ''
 
   loading.value = false
 
+  vehicleForm.value = {
+    images: [],
+    make: '',
+    model: '',
+    year: '',
+    registration_card_number: '',
+    plate_number: ''
+  }
+
+  appointmentForm.value = {
+    scheduled_date: '',
+    scheduled_time: '',
+    additional_notes: '',
+  }
+  
   router.push('/')
 } 
 
