@@ -9,6 +9,7 @@ import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { useVehicle } from '../../composables/useVehicle';
 import { useAppointment } from '../../composables/useAppointment';
+import BaseToast from '../../components/BaseToast.vue';
 
 type TimeSlot = {
   label: string,
@@ -33,6 +34,7 @@ const errors = ref<any>(null)
 const { token } = useAuth()
 const { vehicle } = useVehicle()
 const isDisabled = ref(false)
+const toast = ref<InstanceType<typeof BaseToast> | null>(null)
 
 function selectTime(time: TimeSlot) {
   selectedTime.value = time.value ?? ''
@@ -57,6 +59,34 @@ async function submit() {
     await dbHelper.post(`/appointment/${vehicle.value?.id}`, form.value, token.value ?? '');
 
     currentStep.value += 1
+  } catch (error: any) {
+    errors.value = error.response.errors
+  } finally {
+    loading.value = false
+  }
+}
+
+async function update() {
+  const dateObj = new Date()
+  const formData = new FormData()
+
+  loading.value = true
+
+  form.value.scheduled_date = dateObj.toISOString().split('T')[0] ?? ''
+  form.value.scheduled_time = selectedTime.value ?? ''
+
+  formData.append('_method', 'PUT')
+
+  formData.append('scheduled_date', form.value.scheduled_date)
+  formData.append('scheduled_time', form.value.scheduled_time)
+  formData.append('additional_notes', form.value.additional_notes)
+
+  try {
+    await dbHelper.post(`/appointment/${vehicle.value?.id}`, formData, token.value ?? '')
+
+    isDisabled.value = false
+
+    toast.value?.showToast("Appointment Information Updated Successfully")
   } catch (error: any) {
     errors.value = error.response.errors
   } finally {
@@ -99,6 +129,12 @@ function initializeForm() {
   return
 }
 
+function openEdit() {
+  isDisabled.value = !isDisabled.value
+
+  errors.value = null
+}
+
 const cannotEdit = computed(() => {
   if (vehicle.value && !isDisabled.value) return true
 
@@ -122,13 +158,13 @@ onMounted(() => {
         <p class="text-base text-black">Choose a convenient date and time for doorstep deregistration</p>
       </div>
 
-      <button v-if="appointment && !isDisabled" class="flex items-center space-x-2" @click="isDisabled = true">
+      <button v-if="appointment && !isDisabled" class="flex items-center space-x-2" @click="openEdit">
         <PencilIcon class="size-4 stroke-gray-800" />
         
         <span class="text-base">Edit</span>
       </button>
 
-      <button v-if="appointment && isDisabled" class="flex items-center" @click="isDisabled = false">
+      <button v-if="appointment && isDisabled" class="flex items-center" @click="openEdit">
         <span class="text-base">Cancel</span>
       </button>
     </div>
@@ -177,8 +213,20 @@ onMounted(() => {
       </div>
 
       <div class="col-span-2 sm:col-span-1">
-        <BaseButton @click="submit">Continue to Track Collection</BaseButton>
+        <BaseButton 
+          v-if="cannotEdit"
+          :loading="loading"
+          @click="submit"
+        >Continue to Track Collection</BaseButton>
+
+        <BaseButton 
+          v-if="!cannotEdit"
+          :loading="loading"
+          @click="update"
+        >Update</BaseButton>
       </div>
     </div>
   </div>
+
+  <BaseToast ref="toast" />
 </template>

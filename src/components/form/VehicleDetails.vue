@@ -10,7 +10,9 @@ import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { getError } from '../../helpers/errorHelper';
 import BaseCombobox from '../BaseCombobox.vue';
+import BaseToast from '../../components/BaseToast.vue';
 
+const toast = ref<InstanceType<typeof BaseToast> | null>(null)
 const { token } = useAuth()
 const images = ref<any>([])
 const previews = ref<string[]>([]) 
@@ -131,6 +133,45 @@ async function submit() {
   }
 } 
 
+async function update() {
+  loading.value = true
+  errors.value = null
+
+  const formData = new FormData()
+
+  formData.append('_method', 'PUT')
+
+  formData.append('plate_number', form.value.plate_number)
+  formData.append('make', form.value.make)
+  formData.append('model', form.value.model)
+  formData.append('year', form.value.year)
+  formData.append('registration_card_number', form.value.registration_card_number)
+
+  if (form.value.images && form.value.images.length > 0) {
+    for (let i = 0; i < form.value.images.length; i++) {
+      formData.append('images[]', form.value.images[i])
+    }
+  }
+
+  try {
+    await dbHelper.post(`/vehicle/${vehicle.value?.id}`, formData, token.value ?? '');
+
+    isDisabled.value = false
+
+    toast.value?.showToast("Vehicle Information Updated Successfully")
+  } catch (error: any) {
+    errors.value = error.response.errors
+  } finally {
+    loading.value = false
+  }
+}
+
+function openEdit() {
+  isDisabled.value = !isDisabled.value
+
+  errors.value = null
+}
+
 const cannotEdit = computed(() => {
   if (vehicle.value && !isDisabled.value) return true
 
@@ -155,13 +196,13 @@ onMounted(() => {
         <p class="text-base text-black">Tell us about your vehicle and upload photos</p>
       </div>
 
-      <button v-if="vehicle && !isDisabled" class="flex items-center space-x-2" @click="isDisabled = true">
+      <button v-if="vehicle && !isDisabled" class="flex items-center space-x-2" @click="openEdit">
         <PencilIcon class="size-4 stroke-gray-800" />
         
         <span class="text-base">Edit</span>
       </button>
 
-      <button v-if="vehicle && isDisabled" class="flex items-center" @click="isDisabled = false">
+      <button v-if="vehicle && isDisabled" class="flex items-center" @click="openEdit">
         <span class="text-base">Cancel</span>
       </button>
     </div>
@@ -289,10 +330,19 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton
+          v-if="cannotEdit"
           :loading="loading"
           @click="submit"
         >Continue to Schedule</BaseButton>
+
+        <BaseButton 
+          v-if="!cannotEdit"
+          :loading="loading"
+          @click="update"
+        >Update</BaseButton>
       </div>
     </div>
   </div>
+
+  <BaseToast ref="toast" />
 </template>
