@@ -196,13 +196,13 @@ onMounted(() => {
         <p class="text-base text-black">Tell us about your vehicle and upload photos</p>
       </div>
 
-      <button v-if="vehicle && !isDisabled" class="flex items-center space-x-2" @click="openEdit">
+      <button v-if="!cannotEdit" class="flex items-center space-x-2" @click="openEdit">
         <PencilIcon class="size-4 stroke-gray-800" />
         
         <span class="text-base">Edit</span>
       </button>
 
-      <button v-if="vehicle && isDisabled" class="flex items-center" @click="openEdit">
+      <button v-if="isDisabled" class="flex items-center" @click="openEdit">
         <span class="text-base">Cancel</span>
       </button>
     </div>
@@ -330,13 +330,13 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton
-          v-if="!cannotEdit"
+          v-if="cannotEdit"
           :loading="loading"
           @click="submit"
         >Continue to Schedule</BaseButton>
 
         <BaseButton 
-          v-if="cannotEdit"
+          v-if="!cannotEdit"
           :loading="loading"
           @click="update"
         >Update</BaseButton>
