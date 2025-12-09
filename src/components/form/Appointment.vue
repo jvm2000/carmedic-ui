@@ -16,9 +16,10 @@ type TimeSlot = {
   value: string,
 }
 
-const { prevStep, currentStep, appointmentForm: form } = useForm()
+const { prevStep, currentStep, appointmentForm: form, doneLoggedStep } = useForm()
 const { appointment } = useAppointment()
 const selectedTime = ref<string>('')
+const selectedDate = ref<string>('')
 const timeSlots: TimeSlot[] = [
   { label: '9:00 AM', value: '09:00:00' },
   { label: '10:00 AM', value: '10:00:00' },
@@ -40,6 +41,13 @@ function selectTime(time: TimeSlot) {
   selectedTime.value = time.value ?? ''
 }
 
+function parseToYMD(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 async function submit() { 
   if (appointment.value) {
     window.scrollTo({ top: 0, behavior: 'auto' })
@@ -48,11 +56,9 @@ async function submit() {
     return
   }
 
-  const dateObj = new Date()
-
   loading.value = true
 
-  form.value.scheduled_date = dateObj.toISOString().split('T')[0] ?? ''
+  form.value.scheduled_date = parseToYMD(new Date(selectedDate.value))
   form.value.scheduled_time = selectedTime.value ?? ''
 
   try {
@@ -67,13 +73,13 @@ async function submit() {
 }
 
 async function update() {
-  const dateObj = new Date()
-  const formData = new FormData()
-
   loading.value = true
 
-  form.value.scheduled_date = dateObj.toISOString().split('T')[0] ?? ''
+  const formData = new FormData()
+  
   form.value.scheduled_time = selectedTime.value ?? ''
+
+  form.value.scheduled_date = parseToYMD(new Date(selectedDate.value))
 
   formData.append('_method', 'PUT')
 
@@ -136,7 +142,7 @@ function openEdit() {
 }
 
 const cannotEdit = computed(() => {
-  if (vehicle.value && !isDisabled.value) return true
+  if (doneLoggedStep.value > 2 && isDisabled.value) return true
 
   return false
 })
@@ -171,7 +177,7 @@ onMounted(() => {
 
     <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-10">
       <BaseCalendar
-        v-model="form.scheduled_date"
+        v-model="selectedDate"
         :disabled="cannotEdit"
       />
 
@@ -214,13 +220,13 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton 
-          v-if="cannotEdit"
+          v-if="!cannotEdit"
           :loading="loading"
           @click="submit"
         >Continue to Track Collection</BaseButton>
 
         <BaseButton 
-          v-if="!cannotEdit"
+          v-if="cannotEdit"
           :loading="loading"
           @click="update"
         >Update</BaseButton>

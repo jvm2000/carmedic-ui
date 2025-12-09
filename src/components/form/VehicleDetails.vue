@@ -18,7 +18,7 @@ const images = ref<any>([])
 const previews = ref<string[]>([]) 
 const loading = ref(false)
 const errors = ref<any>(null)
-const { currentStep, prevStep, vehicleForm: form } = useForm()
+const { currentStep, prevStep, vehicleForm: form, doneLoggedStep } = useForm()
 const errorMessage = ref('')
 const { vehicle } = useVehicle()
 const makes = ref<any>([])
@@ -173,7 +173,7 @@ function openEdit() {
 }
 
 const cannotEdit = computed(() => {
-  if (vehicle.value && !isDisabled.value) return true
+  if (doneLoggedStep.value > 1 && isDisabled.value) return true
 
   return false
 })
@@ -330,13 +330,13 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton
-          v-if="cannotEdit"
+          v-if="!cannotEdit"
           :loading="loading"
           @click="submit"
         >Continue to Schedule</BaseButton>
 
         <BaseButton 
-          v-if="!cannotEdit"
+          v-if="cannotEdit"
           :loading="loading"
           @click="update"
         >Update</BaseButton>

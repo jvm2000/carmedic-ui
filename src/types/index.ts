@@ -58,7 +58,7 @@ export type VehicleForm = {
 
 export type AppointmentForm = {
   vehicle_id?: string;
-  scheduled_date: string;
+  scheduled_date?: string;
   scheduled_time: string;
   additional_notes: string;
   status?: 'pending' | 'confirmed' | 'completed' | 'cancelled';

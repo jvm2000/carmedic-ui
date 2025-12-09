@@ -6,6 +6,8 @@ import { useAuth } from '../composables/useAuth';
 import { useForm } from '../composables/useForm';
 import { dbHelper } from '../helpers/dbHelper';
 import { ref, watchEffect } from 'vue';
+import { useVehicle } from '../composables/useVehicle';
+import { useAppointment } from '../composables/useAppointment';
 
 const { currentStep, setTitle, titleChuck, doneLoggedStep, vehicleForm, appointmentForm } = useForm()
 const { token } = useAuth()
@@ -13,6 +15,9 @@ const router = useRouter()
 const loading = ref(false)
 
 async function logout() {
+  const { vehicle } = useVehicle()
+  const { appointment } = useAppointment()
+
   loading.value = true
 
   await dbHelper.post('/logout', {}, token.value ?? '');
@@ -35,6 +40,9 @@ async function logout() {
     scheduled_time: '',
     additional_notes: '',
   }
+
+  vehicle.value = null
+  appointment.value = null
   
   router.push('/')
 } 
