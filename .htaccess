@@ -1,12 +1,18 @@
 <IfModule mod_rewrite.c>
   RewriteEngine On
-  RewriteBase /v2/
+  RewriteBase /carmedic/
 
-  # If the request is a file or directory, serve it
+  # Allow existing files and directories (icons, assets, images, css, js, etc.)
   RewriteCond %{REQUEST_FILENAME} -f [OR]
   RewriteCond %{REQUEST_FILENAME} -d
   RewriteRule ^ - [L]
 
-  # Otherwise, redirect all requests to index.html
+  # Bypass Vite assets
+  RewriteRule ^assets/ - [L]
+
+  # Bypass icons folder
+  RewriteRule ^icons/ - [L]
+
+  # For Single Page Application, redirect all other routes to index.html
   RewriteRule ^ index.html [L]
 </IfModule>

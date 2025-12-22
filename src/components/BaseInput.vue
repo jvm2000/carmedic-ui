@@ -107,7 +107,7 @@ function handleInput(e: Event) {
 <template>
   <div class="flex flex-col space-y-2 w-full">
     <label 
-      class="text-base font-medium"
+      class="text-base font-medium text-left"
       :class="[props.disabled ? 'text-gray-500' : 'text-black']"
     >
       {{ props.label }} 

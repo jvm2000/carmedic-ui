@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { CalendarDaysIcon } from '@heroicons/vue/24/outline'
 import BaseCalendar from '../BaseCalendar.vue';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import BaseTextArea from '../BaseTextArea.vue';
 import { useForm } from '../../composables/useForm';
 import BaseButton from '../BaseButton.vue';
@@ -127,7 +127,7 @@ async function fetchAppointment() {
 
 function initializeForm() {
   if (appointment.value) {
-    form.value.scheduled_date = appointment.value.scheduled_date ?? ''
+    selectedDate.value = appointment.value.scheduled_date ?? ''
     selectedTime.value = appointment.value.scheduled_time ?? ''
     form.value.additional_notes = appointment.value.additional_notes ?? ''
   }
@@ -140,12 +140,6 @@ function openEdit() {
 
   errors.value = null
 }
-
-const cannotEdit = computed(() => {
-  if (doneLoggedStep.value > 2 && isDisabled.value) return true
-
-  return false
-})
 
 onMounted(() => {
   fetchAppointment()
@@ -164,7 +158,7 @@ onMounted(() => {
         <p class="text-base text-black">Choose a convenient date and time for doorstep deregistration</p>
       </div>
 
-      <button v-if="!cannotEdit" class="flex items-center space-x-2" @click="openEdit">
+      <button v-if="doneLoggedStep > 1 && !isDisabled" class="flex items-center space-x-2" @click="openEdit">
         <PencilIcon class="size-4 stroke-gray-800" />
         
         <span class="text-base">Edit</span>
@@ -178,7 +172,7 @@ onMounted(() => {
     <div class="grid grid-cols-1 sm:grid-cols-2 w-full gap-10">
       <BaseCalendar
         v-model="selectedDate"
-        :disabled="cannotEdit"
+        :disabled="doneLoggedStep > 1 && !isDisabled"
       />
 
       <div class="flex flex-col space-y-2 w-full">
@@ -196,7 +190,7 @@ onMounted(() => {
                 ? 'bg-red-500 text-white border-red-600'
                 : 'bg-gray-50 text-black border-gray-300 hover:bg-gray-100'
             ]"
-            :disabled="cannotEdit"
+            :disabled="doneLoggedStep > 1 && !isDisabled"
             @click="selectTime(time)"
           >
             {{ time.label }}
@@ -210,7 +204,7 @@ onMounted(() => {
       label="Additional Notes"
       placeholder="Please kindly a note here if possible."
       required
-      :disabled="cannotEdit"
+      :disabled="doneLoggedStep > 1 && !isDisabled"
     />
 
     <div class="grid grid-cols-2 gap-6 w-full">
@@ -220,13 +214,13 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton 
-          v-if="cannotEdit"
+          v-if="!isDisabled"
           :loading="loading"
           @click="submit"
         >Continue to Track Collection</BaseButton>
 
         <BaseButton 
-          v-if="!cannotEdit"
+          v-if="isDisabled"
           :loading="loading"
           @click="update"
         >Update</BaseButton>

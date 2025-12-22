@@ -10,6 +10,7 @@ import { useAuth } from '../composables/useAuth';
 import type { SignUpForm } from '../types';
 import { useRouter } from 'vue-router';
 import { useForm } from '../composables/useForm';
+import { ArrowLeftIcon } from '@heroicons/vue/24/outline'
 
 type LoginForm = {
   email: string,
@@ -151,13 +152,13 @@ watchEffect(() => {
       <img src="/images/logo.png" alt="" class="h-16">
 
       <div class="max-w-lg w-full rounded-lg shadow-sm p-6 flex flex-col items-start space-y-6 border border-red-200 bg-white">
-        <div>
+        <div v-if="type !== 'forgot-password'">
           <h2 class="text-lg font-bold">Welcome</h2>
 
           <span class="text-base text-gray-700">Login or create an account to continue</span>
         </div>
 
-        <div class="w-full flex items-center bg-gray-100 rounded-lg p-1.5">
+        <div v-if="type !== 'forgot-password'" class="w-full flex items-center bg-gray-100 rounded-lg p-1.5">
           <button 
             class="p-1.5 text-center0 w-full"
             :class="[type === 'login' ? 'bg-gray-50 text-black font-medium' : 'text-gray-500']"
@@ -171,7 +172,7 @@ watchEffect(() => {
         </div>
 
         <form method="POST" @submit.prevent="submitForm" class="flex flex-col items-center space-y-8 w-full">
-          <div v-if="type === 'login'" class="space-y-6 w-full">
+          <div v-if="type === 'login'" class="space-y-4 w-full">
             <BaseInput 
               v-model="loginForm.email"
               type="Email"
@@ -181,17 +182,27 @@ watchEffect(() => {
               required
             />
 
-            <BaseInput 
-              v-model="loginForm.password"
-              type="password"
-              label="Password"
-              placeholder="**********"
-              :error="typeError === 'login' ? getError(errors, 'message') : getError(errors, 'password')"
-              required
-            />
+            <div class="space-y-2">
+              <BaseInput 
+                v-model="loginForm.password"
+                type="password"
+                label="Password"
+                placeholder="**********"
+                :error="typeError === 'login' ? getError(errors, 'message') : getError(errors, 'password')"
+                required
+              />
+            </div>
+
+            <div class="flex justify-end">
+              <button 
+                type="button" 
+                class="outline-none bg-inherit text-base text-black font-medium"
+                @click="type = 'forgot-password'"
+              >Forgot password?</button>
+            </div>
           </div>
 
-          <div v-if="type === 'signup'" class="space-y-6 w-full">
+          <div v-if="type === 'signup'" class="space-y-4 w-full">
             <BaseInput 
               v-model="form.email"
               type="email"
@@ -278,11 +289,36 @@ watchEffect(() => {
             />
           </div>
 
+          <div v-if="type === 'forgot-password'" class="space-y-4 w-full">
+            <button type="button" class="flex items-center space-x-2" @click="type = 'login'">
+              <ArrowLeftIcon class="stroke-gray-400 size-4" />
+
+              <p class="text-gray-500 text-base">Back to Login</p>
+            </button>
+
+            <div class="flex flex-col items-start">
+              <h2 class="text-lg font-bold">Forgot Password</h2>
+
+              <span class="text-base text-gray-700 text-left">Enter your email address and we'll send you a link to reset your password</span>
+            </div>
+
+            <div class="pt-2">
+              <BaseInput 
+                v-model="loginForm.email"
+                type="Email"
+                label="Email"
+                placeholder="your@email.com"
+                :error="getError(errors, 'email')"
+                required
+              />
+            </div>
+          </div>
+
           <BaseButton
             :loading
             isSubmitting
             @click="type === 'login' ? login() : register()">
-          {{ type === 'login' ? 'Login' : 'Signup' }}</BaseButton>
+          {{ type === 'login' ? 'Login' : type === 'forgot-password' ? 'Send Reset Link' : 'Signup'  }}</BaseButton>
         </form>
       </div>
     </div>

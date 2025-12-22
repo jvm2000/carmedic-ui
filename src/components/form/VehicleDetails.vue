@@ -5,7 +5,7 @@ import { ArrowUpTrayIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 import BaseButton from '../BaseButton.vue';
 import { useForm } from '../../composables/useForm';
 import { useVehicle } from '../../composables/useVehicle';
-import { computed, onMounted, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { dbHelper } from '../../helpers/dbHelper';
 import { useAuth } from '../../composables/useAuth';
 import { getError } from '../../helpers/errorHelper';
@@ -31,7 +31,7 @@ async function getMakes() {
 }
 
 function uploadImage() {
-  if (cannotEdit.value) return
+  if (doneLoggedStep.value > 0 && !isDisabled.value) return
 
   document.getElementById('profile-photo')?.click()
 }
@@ -90,7 +90,7 @@ function initializeForm() {
     form.value.year = vehicle.value.year || ''
     form.value.registration_card_number = vehicle.value.registration_card_number || ''
     previews.value = vehicle.value.images.map((img: string) => {
-      return `${import.meta.env.BASE_URL}/storage/${img}`
+      return `https://abledonline.com/carmedic/api/storage/app/public/${img}`
     })
   }
 
@@ -172,12 +172,6 @@ function openEdit() {
   errors.value = null
 }
 
-const cannotEdit = computed(() => {
-  if (doneLoggedStep.value > 1 && isDisabled.value) return true
-
-  return false
-})
-
 onMounted(() => {
   getMakes(),
   fetchVehicle()
@@ -196,7 +190,7 @@ onMounted(() => {
         <p class="text-base text-black">Tell us about your vehicle and upload photos</p>
       </div>
 
-      <button v-if="!cannotEdit" class="flex items-center space-x-2" @click="openEdit">
+      <button v-if="doneLoggedStep > 0 && !isDisabled" class="flex items-center space-x-2" @click="openEdit">
         <PencilIcon class="size-4 stroke-gray-800" />
         
         <span class="text-base">Edit</span>
@@ -215,7 +209,7 @@ onMounted(() => {
           label="Brand"
           placeholder="Select a Brand"
           required
-          :disabled="cannotEdit"
+          :disabled="doneLoggedStep > 0 && !isDisabled"
           :error="getError(errors, 'make')"
         />
       </div>
@@ -226,7 +220,7 @@ onMounted(() => {
           label="Model"
           placeholder="Camry"
           required
-          :disabled="cannotEdit"
+          :disabled="doneLoggedStep > 0 && !isDisabled"
           :error="getError(errors, 'model')"
         />
       </div>
@@ -237,7 +231,7 @@ onMounted(() => {
           label="Year"
           placeholder="2020"
           required
-          :disabled="cannotEdit"
+          :disabled="doneLoggedStep > 0 && !isDisabled"
           :error="getError(errors, 'year')"
         />
       </div>
@@ -249,7 +243,7 @@ onMounted(() => {
           placeholder="ABC-1234"
           required
           formatted
-          :disabled="cannotEdit"
+          :disabled="doneLoggedStep > 0 && !isDisabled"
           :error="getError(errors, 'plate_number')"
         />
       </div>
@@ -261,7 +255,7 @@ onMounted(() => {
           placeholder="1HGBVNXXMAS1098296"
           required
           uppercase
-          :disabled="cannotEdit"
+          :disabled="doneLoggedStep > 0 && !isDisabled"
           :error="getError(errors, 'registration_card_number')"
         />
       </div>
@@ -280,15 +274,15 @@ onMounted(() => {
 
           <div 
             class="relative w-full border-dashed border-2 border-gray-400 rounded-lg grid place-items-center h-36"
-            :class="[cannotEdit ? 'cursor-not-allowed' : 'cursor-pointer hover:border-red-500 ']"
+            :class="[doneLoggedStep > 0 && !isDisabled ? 'cursor-not-allowed' : 'cursor-pointer hover:border-red-500 ']"
              @click="uploadImage"
           >
             <div class="flex flex-col items-center space-y-0">
-              <ArrowUpTrayIcon v-if="!cannotEdit" class="size-8 stroke-gray-600" />
-              <LockClosedIcon v-if="cannotEdit" class="size-8 stroke-gray-600" />
+              <ArrowUpTrayIcon v-if="doneLoggedStep > 0 && isDisabled" class="size-8 stroke-gray-600" />
+              <LockClosedIcon v-if="doneLoggedStep > 0 && !isDisabled" class="size-8 stroke-gray-600" />
 
-              <span class="text-base text-gray-500">{{ cannotEdit ? 'Cannot edit' : 'Click to upload or drag and drop<'}}</span>
-              <span v-if="!cannotEdit" class="text-sm text-gray-500">PNG, JPG up to  10MB each</span>
+              <span class="text-base text-gray-500">{{ doneLoggedStep > 0 && !isDisabled ? 'Cannot edit' : 'Click to upload or drag and drop<'}}</span>
+              <span v-if="isDisabled" class="text-sm text-gray-500">PNG, JPG up to  10MB each</span>
             </div>
 
             <input 
@@ -314,7 +308,7 @@ onMounted(() => {
             <img class="w-full object-cover" :src="src" alt="Vehicle Image Preview" />
 
             <div 
-              v-if="!cannotEdit"
+              v-if="doneLoggedStep > 0 && isDisabled"
               class="bg-red-500 rounded-full size-6 grid place-items-center absolute top-1 right-1 cursor-pointer"
                @click="removeImage(index)"
             >
@@ -330,13 +324,13 @@ onMounted(() => {
 
       <div class="col-span-2 sm:col-span-1">
         <BaseButton
-          v-if="cannotEdit"
+          v-if="!isDisabled"
           :loading="loading"
           @click="submit"
         >Continue to Schedule</BaseButton>
 
         <BaseButton 
-          v-if="!cannotEdit"
+          v-if="isDisabled"
           :loading="loading"
           @click="update"
         >Update</BaseButton>

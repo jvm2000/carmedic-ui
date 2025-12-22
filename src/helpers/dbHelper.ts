@@ -1,4 +1,14 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL
+function getApiBaseUrl(): string {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL
+  }
+
+  return import.meta.env.DEV
+    ? 'http://localhost:8000/api'
+    : 'https://api.yourdomain.com/api'
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 interface FetchOptions {
   method: string;
